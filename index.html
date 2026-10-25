@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Колесо года</title>
+<style>
+  :root{
+    --parch:#efe2c2;
+    --parch2:#e3d0a6;
+    --ink:#33241a;
+    --ochre:#a8762b;
+    --red:#7b2c1d;
+    --moss:#4c5c38;
+    --gold:#c9a24a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:#15110d;}
+  body{
+    font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;justify-content:center;
+    padding:14px 10px 28px;
+    background:
+      radial-gradient(circle at 50% -10%, #2a2119 0%, #15110d 60%);
+  }
+  .scroll{
+    position:relative;
+    width:100%;max-width:460px;
+    background:
+      radial-gradient(circle at 20% 8%, rgba(255,255,255,.55), transparent 40%),
+      radial-gradient(circle at 82% 92%, rgba(140,100,50,.28), transparent 45%),
+      repeating-linear-gradient(90deg, rgba(120,90,50,.055) 0 2px, transparent 2px 7px),
+      linear-gradient(170deg,var(--parch) 0%,var(--parch2) 55%,#d8c091 100%);
+    border-radius:6px;
+    box-shadow:0 0 0 1px rgba(60,40,20,.35), 0 18px 44px rgba(0,0,0,.65), inset 0 0 42px rgba(120,80,30,.22);
+    padding:20px 16px 24px;
+  }
+  /* rolled edges of the parchment */
+  .scroll:before,.scroll:after{
+    content:"";position:absolute;left:-6px;right:-6px;height:16px;
+    background:linear-gradient(180deg,#c9b183,#8d7550 40%,#c8b083);
+    border-radius:8px;
+    box-shadow:0 3px 8px rgba(0,0,0,.5);
+  }
+  .scroll:before{top:-10px}
+  .scroll:after{bottom:-10px;transform:rotate(180deg)}
+
+  h1{
+    margin:2px 0 0;text-align:center;
+    font-size:23px;letter-spacing:.22em;text-transform:uppercase;
+    font-weight:600;color:var(--red);
+    text-shadow:0 1px 0 rgba(255,255,255,.6);
+  }
+  .sub{
+    text-align:center;font-size:11.5px;letter-spacing:.34em;
+    text-transform:uppercase;color:var(--ochre);margin:6px 0 2px;
+  }
+  .rule{
+    height:12px;margin:10px auto 6px;max-width:300px;
+    background:
+      radial-gradient(circle at 50% 50%, var(--ochre) 0 2.5px, transparent 3px),
+      linear-gradient(90deg,transparent,var(--ochre) 18%,transparent 18.5%,transparent 81.5%,var(--ochre) 82%,transparent);
+    background-size:100% 100%;
+    opacity:.75;
+  }
+
+  .wheelwrap{position:relative;margin:6px auto 4px;max-width:400px}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+
+  .banner{
+    margin:10px 0 0;text-align:center;
+  }
+  .nextname{
+    font-size:21px;color:var(--red);letter-spacing:.06em;
+  }
+  .nextdate{font-size:12.5px;color:var(--ochre);letter-spacing:.12em;margin-top:3px}
+  .count{
+    font-size:38px;line-height:1.05;color:var(--ink);
+    font-variant-numeric:tabular-nums;margin:8px 0 0;
+  }
+  .count small{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ochre);display:block;margin-top:4px}
+
+  .bar{
+    height:7px;border-radius:4px;background:rgba(120,90,50,.22);
+    margin:12px 6px 0;overflow:hidden;
+    box-shadow:inset 0 1px 2px rgba(80,55,25,.3);
+  }
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--gold));}
+
+  .tip{
+    margin:14px 4px 0;padding:12px 14px;
+    border-left:3px solid var(--ochre);
+    background:rgba(255,250,235,.45);
+    font-size:14.5px;line-height:1.5;
+  }
+  .tip b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:5px}
+
+  .astro{margin:12px 4px 0;font-size:13px;line-height:1.55}
+  .astro b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:5px}
+  .astro ul{margin:0;padding-left:18px}
+  .astro li{margin:2px 0}
+
+  .foot{
+    margin:16px 4px 0;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:rgba(80,55,25,.6);text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="scroll">
+  <h1>Колесо года</h1>
+  <div class="sub" id="today">—</div>
+  <div class="rule"></div>
+
+  <div class="wheelwrap">
+    <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Колесо года"></svg>
+  </div>
+
+  <div class="banner">
+    <div class="nextname" id="nextName">—</div>
+    <div class="nextdate" id="nextDate">—</div>
+    <div class="count"><span id="days">—</span><small>дней до порога</small></div>
+    <div class="bar"><i id="progress" style="width:0%"></i></div>
+  </div>
+
+  <div class="tip">
+    <b>Совет дня</b>
+    <span id="tipText">—</span>
+  </div>
+
+  <div class="astro">
+    <b>Небо</b>
+    <ul id="astroList"></ul>
+  </div>
+
+  <div class="foot">колесо живёт само, обновляется при открытии</div>
+</div>
+
+<script>
+/* ---------- the eight sabbats: month is 1-based ---------- */
+const SABBATS = [
+  {name:"Имболк", gen:"Имболка",   m:2,  d:2,  season:"зима",  note:"первое дыхание весны, свечи и молоко"},
+  {name:"Остара", gen:"Остары",   m:3,  d:20, season:"весна", note:"равноденствие, яйцо и всходы"},
+  {name:"Белтайн", gen:"Белтайна",  m:5,  d:1,  season:"весна", note:"костры, союз, живой огонь"},
+  {name:"Лита", gen:"Литы",     m:6,  d:21, season:"лето",  note:"солнцестояние, полная сила года"},
+  {name:"Лугнасад", gen:"Лугнасада", m:8,  d:1,  season:"лето",  note:"первый сноп, жатва и ремесло"},
+  {name:"Мабон", gen:"Мабона",    m:9,  d:22, season:"осень", note:"равноденствие, счёт и благодарность"},
+  {name:"Самхейн", gen:"Самхейна",  m:10, d:31, season:"осень", note:"тонкая завеса, память, порог"},
+  {name:"Йоль", gen:"Йоля",     m:12, d:21, season:"зима",  note:"солнце рождается заново"}
+];
+
+/* Verified ephemeris goes HERE, one line per event, ISO dates.
+   Empty on purpose: a wrong retrograde is worse than none. */
+const SKY = [
+  // {from:"2026-02-26", to:"2026-03-20", label:"Меркурий ретроградный"},
+];
+
+const SEASON_COLOR = {
+  "зима":"#4a5a63", "весна":"#5c7345", "лето":"#b0842f", "осень":"#7b2c1d"
+};
+
+function ymd(d){const y=d.getFullYear();
+  return {y:y, start:Date.UTC(y,0,1), now:Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())};}
+
+function dayOfYear(y,m,d){return Math.round((Date.UTC(y,m-1,d)-Date.UTC(y,0,1))/86400000)+1;}
+
+function build(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const todayDOY = dayOfYear(y, now.getMonth()+1, now.getDate());
+
+  // year length
+  const yearLen = Math.round((Date.UTC(y+1,0,1) - Date.UTC(y,0,1)) / 86400000);
+
+  const items = SABBATS.map(s=>({...s, doy: dayOfYear(y,s.m,s.d)}))
+                       .sort((a,b)=>a.doy-b.doy);
+
+  document.getElementById('today').textContent =
+    now.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+
+  /* ---------- find next threshold ---------- */
+  let next = items.find(i=>i.doy > todayDOY);
+  let nextYear = y, cycleStart, cycleEnd;
+  if(!next){ next = {...items[0], doy: items[0].doy + yearLen}; nextYear = y+1; }
+  const prev = [...items].reverse().find(i=>i.doy <= todayDOY) || {doy: items[items.length-1].doy - yearLen};
+
+  cycleStart = prev.doy;
+  cycleEnd = next.doy;
+  const frac = (todayDOY - cycleStart) / (cycleEnd - cycleStart);
+
+  const daysLeft = next.doy - todayDOY;
+
+  document.getElementById('nextName').textContent = next.name;
+  document.getElementById('nextDate').textContent =
+    new Date(Date.UTC(nextYear, next.m-1, next.d)).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+  document.getElementById('days').textContent = daysLeft;
+  document.getElementById('progress').style.width = Math.round(frac*100)+'%';
+
+  /* ---------- advice ---------- */
+  const phase = frac < .2 ? "порог пройден" : frac < .55 ? "рост" : frac < .85 ? "полнота" : "собирание";
+  const TIPS = {
+    "порог пройден": `Год только повернулся. Не беги. ${next.gen} ещё далеко, а семя уже в земле.`,
+    "рост": `Середина между ${prevGen(items,prev.doy)} и ${next.gen}. Время делать, не обсуждать.`,
+    "полнота": `До ${next.gen} ${daysLeft} ${plural(daysLeft)}. Самая узкая часть колеса. Проверь, что начал: живо оно или уже нет.`,
+    "собирание": `До ${next.gen} ${daysLeft} ${plural(daysLeft)}, и это счёт. Доделай, отпусти, освободи место.`
+  };
+  document.getElementById('tipText').textContent = TIPS[phase];
+
+  /* ---------- sky ---------- */
+  const ul = document.getElementById('astroList');
+  const iso = now.toISOString().slice(0,10);
+  const live = SKY.filter(e=> e.from <= iso && iso <= e.to);
+  if(live.length){
+    live.forEach(e=>{const li=document.createElement('li'); li.textContent='Сейчас: '+e.label; ul.appendChild(li);});
+  } else {
+    const li=document.createElement('li');
+    li.textContent = SKY.length ? 'Ретроградов нет.' : 'Таблица неба ещё не вписана. Проверенные эфемериды — за тобой.';
+    ul.appendChild(li);
+  }
+
+  drawWheel(items, todayDOY, yearLen, next);
+}
+
+function prevGen(items, doy){
+  const p = [...items].reverse().find(i=>i.doy <= doy);
+  return p ? p.gen : items[items.length-1].gen;
+}
+function plural(n){
+  const a=Math.abs(n)%100, b=a%10;
+  if(a>10&&a<20) return "дней";
+  if(b===1) return "день";
+  if(b>=2&&b<=4) return "дня";
+  return "дней";
+}
+
+/* ---------- the wheel itself ---------- */
+function polar(cx,cy,r,a){return [cx+r*Math.cos(a), cy+r*Math.sin(a)];}
+
+function drawWheel(items, todayDOY, yearLen, next){
+  const svg = document.getElementById('wheel');
+  const NS="http://www.w3.org/2000/svg";
+  const cx=200, cy=200, R=168, Ri=112;
+  const A0 = -Math.PI/2; // Имболк-подобная точка сверху = начало отсчёта
+
+  const g = document.createElementNS(NS,'g');
+  svg.appendChild(g);
+
+  // outer ring
+  const ring = document.createElementNS(NS,'circle');
+  ring.setAttribute('cx',cx);ring.setAttribute('cy',cy);ring.setAttribute('r',R+8);
+  ring.setAttribute('fill','none');ring.setAttribute('stroke','#a8762b');
+  ring.setAttribute('stroke-width','1.4');ring.setAttribute('opacity','.8');
+  g.appendChild(ring);
+
+  const ring2 = ring.cloneNode();
+  ring2.setAttribute('r',Ri-8); ring2.setAttribute('opacity','.55'); g.appendChild(ring2);
+
+  // sectors: boundaries at midpoints between sabbats
+  const bounds = items.map((it,i)=>{
+    const nxt = items[(i+1)%items.length];
+    let a = it.doy, b = nxt.doy;
+    if(b<a) b += yearLen;
+    return {start:it.doy, end:b, mid:(a+b)/2, sabbat:it};
+  });
+
+  function angleFor(doy){ return A0 + (doy/ (yearLen)) * Math.PI*2; }
+
+  bounds.forEach((b,i)=>{
+    const midNext = bounds[(i+1)%bounds.length];
+    const a1 = angleFor(b.mid);
+    const a2 = angleFor(midNext.mid);
+    const [x1,y1]=polar(cx,cy,R,a1), [x2,y2]=polar(cx,cy,R,a2);
+    const [x3,y3]=polar(cx,cy,Ri,a2), [x4,y4]=polar(cx,cy,Ri,a1);
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',`M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${Ri} ${Ri} 0 0 0 ${x4} ${y4} Z`);
+    path.setAttribute('fill', SEASON_COLOR[b.sabbat.season]);
+    path.setAttribute('opacity', b.sabbat.name===next.name ? '.85' : '.42');
+    path.setAttribute('stroke','#5b4222');
+    path.setAttribute('stroke-width','.9');
+    g.appendChild(path);
+  });
+
+  // tick marks
+  for(let i=0;i<96;i++){
+    const a = A0 + (i/96)*Math.PI*2;
+    const [x1,y1]=polar(cx,cy,R+2,a);
+    const [x2,y2]=polar(cx,cy,R+7,a);
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#a8762b');l.setAttribute('stroke-width', i%12===0?'1.6':'.7');
+    g.appendChild(l);
+  }
+
+  // sabbat markers + labels
+  items.forEach(it=>{
+    const a = angleFor(it.doy);
+    const [px,py]=polar(cx,cy,R,a);
+    const [dx,dy]=polar(cx,cy,R-6,a);
+    const dot=document.createElementNS(NS,'circle');
+    dot.setAttribute('cx',px);dot.setAttribute('cy',py);dot.setAttribute('r','4.6');
+    dot.setAttribute('fill','#f3e6c8');dot.setAttribute('stroke','#5b4222');dot.setAttribute('stroke-width','1.2');
+    g.appendChild(dot);
+
+    const [lx,ly]=polar(cx,cy,Ri+30,a);
+    const t=document.createElementNS(NS,'text');
+    t.setAttribute('x',lx);t.setAttribute('y',ly);
+    t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('font-size','11.5');t.setAttribute('letter-spacing','.08em');
+    t.setAttribute('fill','#33241a');
+    t.setAttribute('font-family',"Georgia,serif");
+    t.textContent = it.name;
+    g.appendChild(t);
+
+    const day=document.createElementNS(NS,'text');
+    const [qx,qy]=polar(cx,cy,Ri+17,a);
+    day.setAttribute('x',qx);day.setAttribute('y',qy);
+    day.setAttribute('text-anchor','middle');day.setAttribute('dominant-baseline','middle');
+    day.setAttribute('font-size','8.5');day.setAttribute('fill','#8a6a33');
+    day.setAttribute('font-family',"Georgia,serif");
+    day.textContent = it.d + '.' + String(it.m).padStart(2,'0');
+    g.appendChild(day);
+  });
+
+  // inner field
+  const inner=document.createElementNS(NS,'circle');
+  inner.setAttribute('cx',cx);inner.setAttribute('cy',cy);inner.setAttribute('r',Ri-10);
+  inner.setAttribute('fill','#f6ecd4');inner.setAttribute('stroke','#a8762b');inner.setAttribute('stroke-width','1');
+  g.appendChild(inner);
+
+  // ogham-like ornament ring inside
+  for(let i=0;i<40;i++){
+    const a = A0 + (i/40)*Math.PI*2;
+    const [x1,y1]=polar(cx,cy,Ri-14,a);
+    const [x2,y2]=polar(cx,cy,Ri-24 - (i%3===0?4:0),a);
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#8a6a33');l.setAttribute('stroke-width', i%3===0?'1.5':'.8');
+    l.setAttribute('stroke-linecap','round');
+    g.appendChild(l);
+  }
+
+  // centre: season + elapsed share
+  const cName=document.createElementNS(NS,'text');
+  cName.setAttribute('x',cx);cName.setAttribute('y',cy-14);
+  cName.setAttribute('text-anchor','middle');cName.setAttribute('font-size','13');
+  cName.setAttribute('letter-spacing','.24em');cName.setAttribute('fill','#7b2c1d');
+  cName.setAttribute('font-family',"Georgia,serif");
+  cName.textContent = 'ГОД';
+  g.appendChild(cName);
+
+  const cDays=document.createElementNS(NS,'text');
+  cDays.setAttribute('x',cx);cDays.setAttribute('y',cy+16);
+  cDays.setAttribute('text-anchor','middle');cDays.setAttribute('font-size','26');
+  cDays.setAttribute('fill','#33241a');cDays.setAttribute('font-family',"Georgia,serif");
+  cDays.setAttribute('font-variant-numeric','tabular-nums');
+  cDays.textContent = String(todayDOY);
+  g.appendChild(cDays);
+
+  const cSub=document.createElementNS(NS,'text');
+  cSub.setAttribute('x',cx);cSub.setAttribute('y',cy+34);
+  cSub.setAttribute('text-anchor','middle');cSub.setAttribute('font-size','8.5');
+  cSub.setAttribute('letter-spacing','.16em');cSub.setAttribute('fill','#8a6a33');
+  cSub.setAttribute('font-family',"Georgia,serif");
+  cSub.textContent = 'день года';
+  g.appendChild(cSub);
+
+  // pointer to today
+  const aNow = angleFor(todayDOY);
+  const [ix,iy]=polar(cx,cy,40,aNow);
+  const [ox,oy]=polar(cx,cy,R-10,aNow);
+  const needle=document.createElementNS(NS,'line');
+  needle.setAttribute('x1',ix);needle.setAttribute('y1',iy);
+  needle.setAttribute('x2',ox);needle.setAttribute('y2',oy);
+  needle.setAttribute('stroke','#7b2c1d');needle.setAttribute('stroke-width','1.6');
+  needle.setAttribute('opacity','.85');
+  g.appendChild(needle);
+
+  const knob=document.createElementNS(NS,'circle');
+  knob.setAttribute('cx',ix);knob.setAttribute('cy',iy);knob.setAttribute('r','3.4');
+  knob.setAttribute('fill','#7b2c1d');
+  g.appendChild(knob);
+}
+
+build();
+</script>
+</body>
+</html>
