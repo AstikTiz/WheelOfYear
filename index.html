@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Колесо года</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#15110d">
+<meta property="og:image" content="https://astiktiz.github.io/WheelOfYear/icon.png">
 <style>
   :root{
     --parch:#efe2c2;
@@ -22,8 +26,21 @@
     min-height:100vh;
     display:flex;justify-content:center;
     padding:14px 10px 28px;
-    background:
-      radial-gradient(circle at 50% -10%, #2a2119 0%, #15110d 60%);
+    background-color:#15110d;
+    background-image:
+      radial-gradient(ellipse at 50% 42%, rgba(12,9,7,.10) 0%, rgba(12,9,7,.55) 62%, rgba(10,8,6,.86) 100%),
+      url("bg.png");
+    background-position:center center, center center;
+    background-size:cover, cover;
+    background-repeat:no-repeat,no-repeat;
+    background-attachment:fixed, fixed;
+  }
+  /* on wide screens show the whole illuminated frame instead of cropping it */
+  @media (min-width:1000px) and (min-aspect-ratio:16/10){
+    body{
+      background-size:auto, contain;
+      background-attachment:fixed, fixed;
+    }
   }
   .scroll{
     position:relative;
