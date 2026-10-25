@@ -101,6 +101,12 @@
   .astro b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:5px}
   .astro ul{margin:0;padding-left:18px}
   .astro li{margin:2px 0}
+  .astro li.sky{margin:0 0 8px;padding-left:0;list-style:none}
+  .astro li.sky b{display:block;font-size:12px;letter-spacing:.02em;color:#3a2a16}
+  .astro li.sky.on b{color:#7b2c1d}
+  .astro .dates{display:block;font-size:11.5px;color:#8a6a33;margin-bottom:2px}
+  .astro .w{display:block;font-size:12.5px}
+  .astro .src{margin:6px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
 
   .foot{
     margin:16px 4px 0;font-size:10.5px;letter-spacing:.1em;
@@ -154,7 +160,32 @@ const SABBATS = [
 /* Verified ephemeris goes HERE, one line per event, ISO dates.
    Empty on purpose: a wrong retrograde is worse than none. */
 const SKY = [
-  // {from:"2026-02-26", to:"2026-03-20", label:"Меркурий ретроградный"},
+  /* Verified 2026 stations. Source: astro.com.ru/retrograde/ (Swiss Ephemeris, NASA JPL DE441).
+     Interpretations are Western astrological tradition, not astronomy. */
+  {p:"Меркурий", from:"2026-02-26", to:"2026-03-20", sign:"Рыбы",
+   bit:"договоры, бумаги, техника и переписка идут в ревизию: чини, но не подписывай новое",
+   fun:"перечитывать, возвращаться к брошенному, старые письма и старые разговоры"},
+  {p:"Меркурий", from:"2026-06-29", to:"2026-07-24", sign:"Рак",
+   bit:"то же, плюс дом и семья: не переезжай, разбери шкафы и старые долги по дому",
+   fun:"возврат к детским местам, семейные истории, письмо, которое давно откладывал"},
+  {p:"Меркурий", from:"2026-10-24", to:"2026-11-13", sign:"Скорпион",
+   bit:"ревизия чужих денег и тайн: не бери кредит, перечитай договор дважды",
+   fun:"глубокое чтение, разбор архива, разговор, который откладывался годами"},
+  {p:"Венера", from:"2026-10-03", to:"2026-11-14", sign:"Скорпион / Весы",
+   bit:"ревизия денег и трат: крупные покупки и новые союзы на паузу",
+   fun:"старая музыка, старая любовь, возврат к прежнему вкусу, а не новый"},
+  {p:"Юпитер", from:"2025-11-11", to:"2026-03-11", sign:"Рак",
+   bit:"рост идёт внутрь: не расширяйся, пересматривай, зачем тебе то, что уже есть",
+   fun:"учиться для себя, а не для галочки; своё вместо чужого масштаба"},
+  {p:"Юпитер", from:"2026-12-13", to:"2027-04-13", sign:"Лев",
+   bit:"не начинай больших вложений и обещаний до середины апреля",
+   fun:"творчество без зрителя, возврат к брошенному большому делу"},
+  {p:"Сатурн", from:"2026-07-26", to:"2026-12-11", sign:"Овен",
+   bit:"ревизия обязательств: что тянешь зря, что пора снять с себя",
+   fun:"тишина, порядок, ремонт, тело вместо шума"},
+  {p:"Марс", from:"2027-01-10", to:"2027-04-01", sign:"—",
+   bit:"в 2026 году Марс не ретрограден, это ближайший период",
+   fun:"старые ссоры и старые дела — разбирать, новых драк не начинать"}
 ];
 
 const SEASON_COLOR = {
@@ -212,13 +243,46 @@ function build(){
   const ul = document.getElementById('astroList');
   const iso = now.toISOString().slice(0,10);
   const live = SKY.filter(e=> e.from <= iso && iso <= e.to);
-  if(live.length){
-    live.forEach(e=>{const li=document.createElement('li'); li.textContent='Сейчас: '+e.label; ul.appendChild(li);});
-  } else {
-    const li=document.createElement('li');
-    li.textContent = SKY.length ? 'Ретроградов нет.' : 'Таблица неба ещё не вписана. Проверенные эфемериды — за тобой.';
+  const soon = SKY.filter(e=> e.from > iso).sort((a,b)=>a.from.localeCompare(b.from)).slice(0,2);
+  const fmt = d => new Date(d+'T00:00:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year: d.slice(0,4)===String(new Date().getFullYear()) ? undefined : 'numeric'});
+  const status = e => {
+    const a = Math.round((Date.parse(e.from)-Date.parse(iso))/86400000);
+    const b = Math.round((Date.parse(e.to)-Date.parse(iso))/86400000);
+    if(a<=0 && b>=0) return b===0 ? 'последний день' : 'осталось ' + b + ' ' + plural(b);
+    if(a>0) return 'через ' + a + ' ' + plural(a);
+    return 'закончился';
+  };
+  function row(e, liveNow){
+    const li = document.createElement('li');
+    li.className = 'sky' + (liveNow ? ' on' : '');
+    const head = document.createElement('b');
+    head.textContent = (liveNow ? 'Сейчас · ' : 'Дальше · ') + e.p + ' R' + (e.sign !== '—' ? ' в ' + e.sign : '');
+    li.appendChild(head);
+    const dates = document.createElement('span');
+    dates.className = 'dates';
+    dates.textContent = fmt(e.from) + ' — ' + fmt(e.to) + ' · ' + status(e);
+    li.appendChild(dates);
+    {
+      const w = document.createElement('span'); w.className='w';
+      w.textContent = 'быт: ' + e.bit;
+      li.appendChild(w);
+      const f = document.createElement('span'); f.className='w';
+      f.textContent = 'досуг: ' + e.fun;
+      li.appendChild(f);
+    }
     ul.appendChild(li);
   }
+  if(live.length) live.forEach(e=>row(e,true));
+  else {
+    const li=document.createElement('li');
+    li.textContent='Ретроградов сейчас нет.';
+    ul.appendChild(li);
+  }
+  soon.forEach(e=>row(e,false));
+  const src=document.createElement('div');
+  src.className='src';
+  src.textContent='даты станций R/D — Swiss Ephemeris / NASA JPL DE441 (astro.com.ru). Трактовки — западная астрологическая традиция, не наука.';
+  ul.parentNode.appendChild(src);
 
   drawWheel(items, todayDOY, yearLen, next);
 }
