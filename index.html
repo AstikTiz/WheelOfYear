@@ -22,8 +22,33 @@
     min-height:100vh;
     display:flex;justify-content:center;
     padding:14px 10px 28px;
-    background:
-      radial-gradient(circle at 50% -10%, #2a2119 0%, #15110d 60%);
+    background-color:#15110d;
+    background-image:
+      radial-gradient(ellipse at 50% 42%, rgba(12,9,7,.08) 0%, rgba(12,9,7,.42) 62%, rgba(10,8,6,.78) 100%),
+      url("bg.png");
+    background-position:center center, center center;
+    background-size:cover, cover;
+    background-repeat:no-repeat,no-repeat;
+    background-attachment:fixed, fixed;
+  }
+  /* portrait phones: the frame is a wide picture, so show it as a band on top
+     instead of cropping it into a flat texture */
+  @media (max-width:640px){
+    body{
+      background-image:
+        linear-gradient(180deg, rgba(10,8,6,0) 62%, rgba(15,11,9,.92) 100%),
+        url("bg.png");
+      background-position: center top, center top;
+      background-size: 100% auto, 100% auto;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: scroll, scroll;
+      padding-top: 118px;
+    }
+    .scroll{max-width:430px}
+  }
+  /* on wide screens show the whole illuminated frame instead of cropping it */
+  @media (min-width:1000px) and (min-aspect-ratio:16/10){
+    body{background-size:contain, contain;background-color:#0d0a08}
   }
   .scroll{
     position:relative;
@@ -32,9 +57,11 @@
       radial-gradient(circle at 20% 8%, rgba(255,255,255,.55), transparent 40%),
       radial-gradient(circle at 82% 92%, rgba(140,100,50,.28), transparent 45%),
       repeating-linear-gradient(90deg, rgba(120,90,50,.055) 0 2px, transparent 2px 7px),
-      linear-gradient(170deg,var(--parch) 0%,var(--parch2) 55%,#d8c091 100%);
+      linear-gradient(170deg,rgba(239,226,194,.90) 0%,rgba(227,208,166,.85) 55%,rgba(216,192,145,.87) 100%);
+    -webkit-backdrop-filter:blur(1.2px) saturate(1.05);
+    backdrop-filter:blur(1.2px) saturate(1.05);
     border-radius:6px;
-    box-shadow:0 0 0 1px rgba(60,40,20,.35), 0 18px 44px rgba(0,0,0,.65), inset 0 0 42px rgba(120,80,30,.22);
+    box-shadow:0 0 0 1px rgba(60,40,20,.28), 0 18px 44px rgba(0,0,0,.45), inset 0 0 42px rgba(120,80,30,.16);
     padding:20px 16px 24px;
   }
   /* rolled edges of the parchment */
@@ -121,6 +148,29 @@
   .runemean{font-size:13.5px;line-height:1.5;margin-top:5px;color:#3a2a16}
   .rune .src{margin:9px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
 
+  .card{margin:10px 4px 0;padding:12px 14px 11px;
+    background:rgba(255,250,235,.5);
+    border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .card>b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:8px}
+  .cardinner{display:flex;align-items:center;gap:13px}
+  #cardFace{width:52px;height:76px;flex:0 0 52px}
+  .cardtxt{min-width:0}
+  .cardname{font-size:15px;color:var(--red);letter-spacing:.04em;line-height:1.25}
+  .cardname small{display:block;font-size:10px;text-transform:uppercase;color:var(--ochre);margin-top:3px;letter-spacing:.16em}
+  .cardmean{font-size:13.5px;line-height:1.5;margin-top:5px;color:#3a2a16}
+  .card .src{margin:9px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
+
+  .guard{margin:10px 4px 0;padding:12px 14px 11px;
+    background:rgba(255,250,235,.5);
+    border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .guard>b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:7px}
+  .grow{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+  .gk{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ochre);flex:0 0 46px}
+  .gv{font-size:14.5px;color:var(--red);letter-spacing:.03em}
+  .gv small{font-size:10px;letter-spacing:.1em;color:var(--ochre);text-transform:uppercase}
+  .gmean{font-size:12.8px;line-height:1.45;margin:2px 0 0 54px;color:#3a2a16}
+  .guard .src{margin:10px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
+
   .foot{
     margin:16px 4px 0;font-size:10.5px;letter-spacing:.1em;
     text-transform:uppercase;color:rgba(80,55,25,.6);text-align:center;
@@ -160,6 +210,27 @@
       </div>
     </div>
     <div class="src">старший футарк, 24 руны. Имена и смыслы — из англосаксонской и норвежской рунических поэм. Это не гадание о будущем: руна дня одна на все сутки и тянется по дате.</div>
+  </div>
+
+  <div class="card">
+    <b>Карта дня</b>
+    <div class="cardinner">
+      <svg id="cardFace" viewBox="0 0 52 76" role="img" aria-label="карта дня"></svg>
+      <div class="cardtxt">
+        <div class="cardname" id="cardName">—</div>
+        <div class="cardmean" id="cardMean">—</div>
+      </div>
+    </div>
+    <div class="src">36 декад зодиака — 36 младших арканов (система Золотой Зари, 1888). Каждая карта держит свой промежуток, поэтому карта дня здесь не тянется случайно, а сменяется по календарю. Старшие арканы дат не имеют: 22 карты привязаны к планетам и знакам, не к числам, — их я в календарь не ставлю.</div>
+  </div>
+
+  <div class="guard">
+    <b>Покровители порога</b>
+    <div class="grow"><span class="gk">Зверь</span><span class="gv" id="beastName">—</span></div>
+    <div class="gmean" id="beastMean">—</div>
+    <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
+    <div class="gmean" id="treeMean">—</div>
+    <div class="src">зверь — славянский календарь: жаворонки на Сорок мучеников (22.03), пчела на Зосиму-пчельника (30.04), кукушка кукует до Петрова дня (12.07), коням роздых на Ильин день (2.08), журавли уходят на Арину (1.10), ворон на Дмитриевские деды (8.11), волчьи свадьбы в январе, медведь на Спиридона-солнцеворота (25.12). дерево — огамический календарь деревьев в реконструкции Роберта Грейвса (1952); в древности такого календаря не засвидетельствовано, это схема XX века.</div>
   </div>
 
   <div class="astro">
@@ -312,6 +383,8 @@ function build(){
 
   drawWheel(items, todayDOY, yearLen, next);
   drawRune();
+  drawCard();
+  drawPatreons();
 }
 
 function prevGen(items, doy){
@@ -377,6 +450,153 @@ function drawRune(){
   svg.appendChild(g);
   document.getElementById('runeName').innerHTML = r[0] + ' <small>' + r[1] + ' · ' + r[2] + '</small>';
   document.getElementById('runeMean').textContent = r[3];
+}
+
+
+/* ---------- карта дня: 36 декад = 36 младших арканов (Golden Dawn, 1888) ---------- */
+const TAROT = [
+  [3,21,"2 Жезлов","план есть, второй шаг ещё не придуман","wand",2],
+  [3,31,"3 Жезлов","корабль в пути, не дёргай его каждый день","wand",3],
+  [4,11,"4 Жезлов","дом, в который можно вернуться; не откладывай","wand",4],
+  [4,21,"5 Пентаклей","зимой видно, кто рядом; посмотри, кто","pent",5],
+  [5,1,"6 Пентаклей","бери и давай ровно, без долгов","pent",6],
+  [5,11,"7 Пентаклей","урожай не готов, не срывай зелёным","pent",7],
+  [5,21,"8 Мечей","путаница в голове; выйди из комнаты, а не из мысли","sword",8],
+  [6,1,"9 Мечей","страх больше предмета страха: назови предмет","sword",9],
+  [6,11,"10 Мечей","дно. дальше только вверх, но сначала признай","sword",10],
+  [6,21,"2 Кубков","двое лучше одного, если один не тянет","cup",2],
+  [7,2,"3 Кубков","праздник как инструмент, а не как побег","cup",3],
+  [7,12,"4 Кубков","предложено больше, чем ты видишь; подними голову","cup",4],
+  [7,22,"5 Жезлов","столкновение; спорь о деле, не о человеке","wand",5],
+  [8,2,"6 Жезлов","тебя услышали; не пересказывай трижды","wand",6],
+  [8,12,"7 Жезлов","держи позицию, усталость не аргумент","wand",7],
+  [8,23,"8 Пентаклей","делай медленно и точно, как мастер","pent",8],
+  [9,3,"9 Пентаклей","результат твой, не отдавай его на суд","pent",9],
+  [9,13,"10 Пентаклей","род и дом; думай дальше одного человека","pent",10],
+  [9,23,"2 Мечей","два пути равны; выбирай по цене, не по вкусу","sword",2],
+  [10,3,"3 Мечей","боль, которую надо пережить, а не решить","sword",3],
+  [10,13,"4 Мечей","пауза как работа, а не как провал","sword",4],
+  [10,23,"5 Кубков","что пролилось, то пролилось; два кубка ещё стоят","cup",5],
+  [11,2,"6 Кубков","прошлое вернулось; не живи в нём","cup",6],
+  [11,12,"7 Кубков","много обещаний, мало тверди; выбери одну","cup",7],
+  [11,22,"8 Жезлов","быстро; не всё, что быстро, легко","wand",8],
+  [12,2,"9 Жезлов","последний рубеж, и ты ещё держишься","wand",9],
+  [12,12,"10 Жезлов","перегруз; сложи часть, потом иди","wand",10],
+  [12,22,"2 Пентаклей","жонглирование: два дела держатся, три нет","pent",2],
+  [1,1,"3 Пентаклей","работа всерьёз; покажи чертёж другому","pent",3],
+  [1,11,"4 Пентаклей","держишь слишком крепко; отпусти край","pent",4],
+  [1,21,"5 Мечей","победа без радости; считай не очки, а цену","sword",5],
+  [1,31,"6 Мечей","переход; вода под лодкой, курс верный","sword",6],
+  [2,10,"7 Мечей","кратчайший путь пахнет обманом, проверь","sword",7],
+  [2,20,"8 Кубков","уходишь от того, что уже не кормит","cup",8],
+  [3,2,"9 Кубков","есть то, что просил; проверь, что просил","cup",9],
+  [3,12,"10 Кубков","лад в доме; это и есть результат","cup",10]
+];
+const DECAN = ["Овен","Овен","Овен","Телец","Телец","Телец","Близнецы","Близнецы","Близнецы",
+  "Рак","Рак","Рак","Лев","Лев","Лев","Дева","Дева","Дева","Весы","Весы","Весы",
+  "Скорпион","Скорпион","Скорпион","Стрелец","Стрелец","Стрелец","Козерог","Козерог","Козерог",
+  "Водолей","Водолей","Водолей","Рыбы","Рыбы","Рыбы"];
+
+/* ---------- зверь: славянский календарь, привязан к началу порога ---------- */
+const BEASTS = [
+  [2,2,"Медведь","просыпается на Спиридона-солнцеворота: сначала бок, потом лапа"],
+  [3,20,"Жаворонок","на Сорок мучеников его пекут из теста: весну зовут руками"],
+  [5,1,"Пчела","на Зосиму-пчельника выставляют ульи: дело начинают, когда тепло, а не когда хочется"],
+  [6,21,"Кукушка","кукует до Петрова дня, потом молчит: срок у голоса короткий"],
+  [8,1,"Конь","на Ильин день коням роздых: работа без отдыха кончается срывом"],
+  [9,22,"Журавль","на Арину уходят на юг: уходит и год, смотри, что осталось в руках"],
+  [10,31,"Ворон","на Дмитриевские деды его видят у поминальных костров: память держит дом"],
+  [12,21,"Волк","в январе волчьи свадьбы: голодный ходит по кругу, не приближайся"]
+];
+
+/* ---------- дерево: огамический календарь Грейвса, 13 месяцев ---------- */
+const TREES = [
+  [12,24,"Берёза","чистое начало; не тащи в новый год старое"],
+  [1,21,"Рябина","защита от чужого глаза: держи своих ближе"],
+  [2,18,"Ясень","длинный горизонт; строй на годы, а не на сезон"],
+  [3,18,"Ольха","рубится легко и не гниёт в воде: делай там, где сыро"],
+  [4,15,"Ива","гибкость; уступи, чтобы устоять"],
+  [5,13,"Боярышник","колючая граница: ждать и не пускать"],
+  [6,10,"Дуб","сила и работа; победа приходит в середине лета"],
+  [7,8,"Падуб","зелёный зимой: не всё умерло, что выглядит мёртвым"],
+  [8,5,"Орешник","знание и вдохновение; лови мысль, пока она рядом"],
+  [9,2,"Виноград","сбор и радость; дели то, что выросло"],
+  [9,30,"Плющ","держит и вьётся: цепляйся за своё, не за чужое"],
+  [10,28,"Камыш","камыш пишет и служит опорой; тихий инструмент дела"],
+  [11,25,"Бузина","тёмная ночь и защита дома; самый короткий, самый тёмный месяц"]
+];
+
+function periodOf(list, d){
+  const key = (d.getMonth()+1)*100 + d.getDate();
+  let best = null;
+  for(const e of list){ const k = e[0]*100+e[1]; if(k<=key && (!best || k > best[0]*100+best[1])) best=e; }
+  return best || list[list.length-1];
+}
+
+function drawCardFace(suit, n){
+  const NS="http://www.w3.org/2000/svg";
+  const svg=document.getElementById('cardFace');
+  svg.innerHTML='';
+  const frame=document.createElementNS(NS,'rect');
+  frame.setAttribute('x','1');frame.setAttribute('y','1');frame.setAttribute('width','50');frame.setAttribute('height','74');
+  frame.setAttribute('rx','4');frame.setAttribute('fill','rgba(255,252,242,.72)');
+  frame.setAttribute('stroke','#a8762b');frame.setAttribute('stroke-width','1.2');
+  svg.appendChild(frame);
+  const inner=document.createElementNS(NS,'rect');
+  inner.setAttribute('x','5');inner.setAttribute('y','5');inner.setAttribute('width','42');inner.setAttribute('height','66');
+  inner.setAttribute('rx','2.5');inner.setAttribute('fill','none');
+  inner.setAttribute('stroke','rgba(123,44,29,.45)');inner.setAttribute('stroke-width','.8');
+  svg.appendChild(inner);
+
+  const g=document.createElementNS(NS,'g');
+  g.setAttribute('stroke','#7b2c1d');g.setAttribute('fill','none');
+  g.setAttribute('stroke-width','1.3');g.setAttribute('stroke-linecap','round');
+  const cols = n<=3 ? n : (n===4 ? 2 : 3);
+  const rows = Math.ceil(n/cols);
+  const x0=26, y0=38, dx=13, dy=11;
+  for(let i=0;i<n;i++){
+    const r=Math.floor(i/cols), c=i%cols;
+    const inRow = Math.min(cols, n-r*cols);
+    const x = x0 + (c - (inRow-1)/2)*dx;
+    const y = y0 + (r - (rows-1)/2)*dy;
+    let el;
+    if(suit==='cup'){
+      el=document.createElementNS(NS,'path');
+      el.setAttribute('d',`M ${x-4} ${y-3} a 4 4 0 0 0 8 0 M ${x} ${y+1} L ${x} ${y+4} M ${x-2.5} ${y+4} L ${x+2.5} ${y+4}`);
+    } else if(suit==='sword'){
+      el=document.createElementNS(NS,'path');
+      el.setAttribute('d',`M ${x} ${y-5} L ${x} ${y+5} M ${x-3} ${y+2} L ${x+3} ${y+2}`);
+    } else if(suit==='wand'){
+      el=document.createElementNS(NS,'path');
+      el.setAttribute('d',`M ${x} ${y-5} L ${x} ${y+5} M ${x} ${y-2} L ${x+2.5} ${y-4} M ${x} ${y+2} L ${x+2.5} ${y+0}`);
+    } else {
+      el=document.createElementNS(NS,'circle');
+      el.setAttribute('cx',x);el.setAttribute('cy',y);el.setAttribute('r','3.4');
+    }
+    g.appendChild(el);
+  }
+  svg.appendChild(g);
+}
+
+function drawCard(){
+  const now=new Date();
+  const e = periodOf(TAROT, now);
+  const i = TAROT.indexOf(e);
+  drawCardFace(e[4], e[5]);
+  const ord = ["I","II","III"][i % 3];
+  document.getElementById('cardName').innerHTML = e[2] +
+    ' <small>' + DECAN[i] + ' · ' + ord + ' декада</small>';
+  document.getElementById('cardMean').textContent = e[3];
+}
+
+function drawPatreons(){
+  const now=new Date();
+  const b = periodOf(BEASTS, now);
+  const t = periodOf(TREES, now);
+  document.getElementById('beastName').textContent = b[2];
+  document.getElementById('beastMean').textContent = b[3];
+  document.getElementById('treeName').textContent = t[2];
+  document.getElementById('treeMean').textContent = t[3];
 }
 
 /* ---------- the wheel itself ---------- */
