@@ -4,10 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Колесо года</title>
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png">
-<meta name="theme-color" content="#15110d">
-<meta property="og:image" content="https://astiktiz.github.io/WheelOfYear/icon.png">
 <style>
   :root{
     --parch:#efe2c2;
@@ -26,21 +22,8 @@
     min-height:100vh;
     display:flex;justify-content:center;
     padding:14px 10px 28px;
-    background-color:#15110d;
-    background-image:
-      radial-gradient(ellipse at 50% 42%, rgba(12,9,7,.10) 0%, rgba(12,9,7,.55) 62%, rgba(10,8,6,.86) 100%),
-      url("bg.png");
-    background-position:center center, center center;
-    background-size:cover, cover;
-    background-repeat:no-repeat,no-repeat;
-    background-attachment:fixed, fixed;
-  }
-  /* on wide screens show the whole illuminated frame instead of cropping it */
-  @media (min-width:1000px) and (min-aspect-ratio:16/10){
-    body{
-      background-size:auto, contain;
-      background-attachment:fixed, fixed;
-    }
+    background:
+      radial-gradient(circle at 50% -10%, #2a2119 0%, #15110d 60%);
   }
   .scroll{
     position:relative;
@@ -125,6 +108,19 @@
   .astro .w{display:block;font-size:12.5px}
   .astro .src{margin:6px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
 
+
+  .rune{margin:14px 4px 0;padding:12px 14px 11px;
+    background:rgba(255,250,235,.5);
+    border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .rune>b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:8px}
+  .runeinner{display:flex;align-items:center;gap:14px}
+  #runeGlyph{width:56px;height:78px;flex:0 0 56px;overflow:visible}
+  .runetxt{min-width:0}
+  .runename{font-size:15px;color:var(--red);letter-spacing:.06em;line-height:1.2}
+  .runename small{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ochre);margin-top:3px;letter-spacing:.2em}
+  .runemean{font-size:13.5px;line-height:1.5;margin-top:5px;color:#3a2a16}
+  .rune .src{margin:9px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
+
   .foot{
     margin:16px 4px 0;font-size:10.5px;letter-spacing:.1em;
     text-transform:uppercase;color:rgba(80,55,25,.6);text-align:center;
@@ -151,6 +147,19 @@
   <div class="tip">
     <b>Совет дня</b>
     <span id="tipText">—</span>
+  </div>
+
+
+  <div class="rune">
+    <b>Руна дня</b>
+    <div class="runeinner">
+      <svg id="runeGlyph" viewBox="0 0 200 180" role="img" aria-label="руна дня"></svg>
+      <div class="runetxt">
+        <div class="runename" id="runeName">—</div>
+        <div class="runemean" id="runeMean">—</div>
+      </div>
+    </div>
+    <div class="src">старший футарк, 24 руны. Имена и смыслы — из англосаксонской и норвежской рунических поэм. Это не гадание о будущем: руна дня одна на все сутки и тянется по дате.</div>
   </div>
 
   <div class="astro">
@@ -302,6 +311,7 @@ function build(){
   ul.parentNode.appendChild(src);
 
   drawWheel(items, todayDOY, yearLen, next);
+  drawRune();
 }
 
 function prevGen(items, doy){
@@ -314,6 +324,59 @@ function plural(n){
   if(b===1) return "день";
   if(b>=2&&b<=4) return "дня";
   return "дней";
+}
+
+
+/* ---------- rune of the day: Elder Futhark, real rune-poem names ---------- */
+const RUNES = [
+  ["Феху","ᚠ","скот, движимое добро","что пришло, то и уйдёт, если не считать",[[100,20,100,160],[100,45,160,20],[100,80,160,55]]],
+  ["Уруз","ᚢ","дикий бык","сила без упряжи: тело сильнее планов",[[60,160,60,20],[60,20,140,60],[140,60,140,120]]],
+  ["Турисаз","ᚦ","турс, шип","не лезь в это сегодня, шип острее руки",[[80,20,80,160],[80,60,140,90],[140,90,80,120]]],
+  ["Ансуз","ᚨ","бог, дыхание","сказанное слово весит больше сделанного",[[80,20,80,160],[80,50,140,20],[80,80,140,50]]],
+  ["Райдо","ᚱ","езда, путь","дорога важнее выбора на этом повороте",[[80,160,80,20],[80,20,140,50],[140,50,80,85]]],
+  ["Кеназ","ᚲ","факел","смотри в темноту, а не вокруг неё",[[150,20,60,90],[60,90,150,160]]],
+  ["Гебо","ᚷ","дар","обмен должен быть равным, иначе это не дар",[[55,25,145,155],[145,25,55,155]]],
+  ["Вуньо","ᚹ","радость","не отвергай хорошее из подозрительности",[[80,160,80,20],[80,20,150,60],[150,60,80,100]]],
+  ["Хагалаз","ᚺ","град","снос, а не катастрофа: расчищает место",[[60,20,60,160],[140,20,140,160],[60,90,140,90]]],
+  ["Наутиз","ᚾ","нужда","теснота показывает, что действительно нужно",[[100,20,100,160],[60,120,140,60]]],
+  ["Иса","ᛁ","лёд","стоять. Не двигай то, что сковано",[[100,20,100,160]]],
+  ["Йера","ᛃ","год, урожай","срок важнее желания",[[150,20,75,90],[75,90,150,160],[50,20,125,90],[125,90,50,160]]],
+  ["Эйваз","ᛇ","тис","держит корнями глубже, чем видно снаружи",[[100,20,100,160],[100,20,70,50],[100,160,130,130]]],
+  ["Перт","ᛈ","тайник, бросок","не всё решается твоей рукой, и это честно",[[65,20,65,160],[135,20,135,160],[65,55,135,90],[135,90,65,125]]],
+  ["Альгиз","ᛉ","защита","подними руки и отступи, это не отступление",[[100,165,100,40],[100,40,60,10],[100,40,140,10]]],
+  ["Соулу","ᛊ","солнце","иди по свету, а не по удобству",[[140,20,60,85],[60,85,140,85],[140,85,60,160]]],
+  ["Тейваз","ᛏ","Тюр, закон","справедливость выше победы",[[100,165,100,20],[55,60,100,20],[145,60,100,20]]],
+  ["Беркана","ᛒ","берёза","рост это медленно и вверх",[[75,20,75,160],[75,30,140,60],[140,60,75,95],[75,100,140,130],[140,130,75,160]]],
+  ["Эваз","ᛖ","конь","движение вдвоём, а не рывок в одиночку",[[65,160,65,20],[65,20,100,70],[100,70,135,20],[135,20,135,160]]],
+  ["Манназ","ᛗ","человек","посмотри, кто рядом, прежде чем решать",[[55,160,55,20],[55,20,100,75],[100,75,145,20],[145,20,145,160]]],
+  ["Лагуз","ᛚ","вода","поддайся, и не сломаешься",[[110,20,110,160],[110,20,80,50]]],
+  ["Ингуз","ᛜ","плод","сядь и дай дойти: раньше не откроется",[[100,20,150,90],[150,90,100,160],[100,160,50,90],[50,90,100,20]]],
+  ["Дагаз","ᛞ","день","перелом: свет на другой стороне",[[55,20,55,160],[145,20,145,160],[55,20,145,160],[145,20,55,160]]],
+  ["Отала","ᛟ","род и дом","назад в своё, а не в чужое",[[100,15,50,80],[50,80,100,145],[100,145,150,80],[150,80,100,15],[100,145,60,175],[100,145,140,175]]]
+];
+
+function runeOfDay(d){
+  const n = Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()) - Date.UTC(2026,0,1))/86400000);
+  return RUNES[((n % 24) + 24) % 24];
+}
+
+function drawRune(){
+  const r = runeOfDay(new Date());
+  const NS="http://www.w3.org/2000/svg";
+  const svg=document.getElementById('runeGlyph');
+  svg.innerHTML='';
+  const g=document.createElementNS(NS,'g');
+  g.setAttribute('fill','none');g.setAttribute('stroke','#5b4222');
+  g.setAttribute('stroke-width','9');g.setAttribute('stroke-linecap','round');
+  g.setAttribute('stroke-linejoin','round');
+  r[4].forEach(([x1,y1,x2,y2])=>{
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    g.appendChild(l);
+  });
+  svg.appendChild(g);
+  document.getElementById('runeName').innerHTML = r[0] + ' <small>' + r[1] + ' · ' + r[2] + '</small>';
+  document.getElementById('runeMean').textContent = r[3];
 }
 
 /* ---------- the wheel itself ---------- */
