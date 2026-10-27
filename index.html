@@ -148,9 +148,12 @@
   .runemean{font-size:13.5px;line-height:1.5;margin-top:5px;color:#3a2a16}
   .rune .src{margin:9px 0 0;font-size:10px;line-height:1.4;color:rgba(80,55,25,.65)}
 
-  .card{margin:10px 4px 0;padding:12px 14px 11px;
+  .card{margin:10px 4px 0;padding:12px 14px 11px;position:relative;overflow:hidden;
     background:rgba(255,250,235,.5);
     border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .card::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:url("data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 320 130%27 preserveAspectRatio=%27xMaxYMax meet%27%3E%3Cg fill=%27%23532110%27%3E%3Cpolygon points=%27150,10 178,86 122,86%27/%3E%3Cpolygon points=%27150,38 186,108 114,108%27/%3E%3Crect x=%27146%27 y=%27100%27 width=%278%27 height=%2726%27/%3E%3Ccircle cx=%27236%27 cy=%2746%27 r=%2726%27/%3E%3Ccircle cx=%27214%27 cy=%2766%27 r=%2717%27/%3E%3Ccircle cx=%27258%27 cy=%2766%27 r=%2717%27/%3E%3Crect x=%27232%27 y=%2770%27 width=%278%27 height=%2752%27/%3E%3Cellipse cx=%27296%27 cy=%2758%27 rx=%2715%27 ry=%2730%27/%3E%3Crect x=%27293%27 y=%2780%27 width=%275%27 height=%2744%27/%3E%3Cpath d=%27M0 126 L70 104 L120 118 L200 96 L320 126 Z%27/%3E%3C/g%3E%3C/svg%3E") right bottom/auto 100% no-repeat;opacity:.16}
+  .card>*{position:relative;z-index:1}
   .card>b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:8px}
   .cardinner{display:flex;align-items:center;gap:13px}
   #cardFace{width:52px;height:76px;flex:0 0 52px}
@@ -230,7 +233,7 @@
     <div class="gmean" id="beastMean">—</div>
     <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
     <div class="gmean" id="treeMean">—</div>
-    <div class="src">зверь — славянский календарь: жаворонки на Сорок мучеников (22.03), пчела на Зосиму-пчельника (30.04), кукушка кукует до Петрова дня (12.07), коням роздых на Ильин день (2.08), журавли уходят на Арину (1.10), ворон на Дмитриевские деды (8.11), волчьи свадьбы в январе, медведь на Спиридона-солнцеворота (25.12). дерево — огамический календарь деревьев в реконструкции Роберта Грейвса (1952); в древности такого календаря не засвидетельствовано, это схема XX века.</div>
+    <div class="src">зверь — славянский календарь: жаворонки на Сорок мучеников (22.03), пчела на Зосиму-пчельника (30.04), кукушка кукует до Петрова дня (12.07), коням роздых на Ильин день (2.08), журавли уходят на Арину (1.10), ворон на Дмитриевские деды (8.11), волчьи свадьбы в январе, медведь на Спиридона-солнцеворота (25.12). дерево — огамический календарь деревьев, реконструкция Роберта Грейвса (1952).</div>
   </div>
 
   <div class="astro">
