@@ -1,0 +1,56 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'bg.png'
+      - 'android/**'
+      - '.github/workflows/android-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy web assets into Android app
+        run: |
+          rm -rf android/app/src/main/assets/www
+          mkdir -p android/app/src/main/assets/www
+          cp index.html bg.png android/app/src/main/assets/www/
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.9
+
+      - name: Assemble debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          find android/app/build/outputs/apk/debug -name '*.apk' -exec cp {} out/koleso-goda-debug.apk \;
+          ls -la out
+
+      - name: Publish to Releases (rolling tag)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: APK (debug, latest)
+          body: |
+            Колесо года, debug APK. Собрано из ветки main (${{ github.sha }}).
+            Ставится вручную, разрешив установку из неизвестного источника.
+          files: out/koleso-goda-debug.apk
+          prerelease: true

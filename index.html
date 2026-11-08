@@ -178,70 +178,136 @@
     margin:16px 4px 0;font-size:10.5px;letter-spacing:.1em;
     text-transform:uppercase;color:rgba(80,55,25,.6);text-align:center;
   }
+
+  /* ---------- листы: страницы листаются вбок ---------- */
+  body{overflow:hidden}
+  .scroll{padding:0;display:flex;flex-direction:column;height:calc(100vh - 42px);height:calc(100dvh - 42px)}
+  .track{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .track::-webkit-scrollbar{display:none}
+  .screen{flex:0 0 100%;height:100%;overflow-y:auto;scroll-snap-align:start;padding:20px 16px 46px}
+  .pagetitle{margin:2px 0 12px;text-align:center;font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);font-weight:600}
+  .dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:9px;z-index:6}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(70,50,25,.26);cursor:pointer}
+  .dots i.on{background:#a8762b;box-shadow:0 0 0 3px rgba(168,118,43,.16)}
+
+  .star{margin:4px 4px 0;padding:8px 6px 12px;text-align:center}
+  #starSvg{width:100%;max-width:290px;height:auto}
+  .starrow{margin:10px 6px 0;padding:11px 13px 10px;background:rgba(255,250,235,.5);
+    border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .starrow .k{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ochre)}
+  .starrow .v{font-size:15px;color:var(--red);letter-spacing:.04em;margin:2px 0 0}
+  .starrow p{font-size:13.5px;line-height:1.5;margin:6px 0 0;color:#3a2a16}
+  .starrow p b{color:var(--ochre);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+  .src{margin:10px 6px 0;font-size:10.5px;line-height:1.45;color:rgba(80,55,25,.68)}
+
+  .moonbox{margin:6px 4px 0;padding:16px 14px 14px;text-align:center;
+    background:rgba(255,250,235,.5);border:1px solid rgba(168,118,43,.35);border-radius:4px}
+  .moonbox .glyph{font-size:56px;line-height:1}
+  .moonbox .nm{font-size:17px;color:var(--red);letter-spacing:.05em;margin-top:6px}
+  .moonbox .sub2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin-top:4px}
+  .moonrows{display:flex;justify-content:center;gap:18px;margin-top:12px}
+  .moonrows div{font-size:13px;color:#3a2a16}
+  .moonrows b{display:block;font-size:15px;color:var(--red);letter-spacing:.03em}
+  .moontip{margin-top:12px;font-size:13.5px;line-height:1.5;color:#3a2a16;font-style:italic}
 </style>
 </head>
 <body>
 <div class="scroll">
-  <h1>Колесо года</h1>
-  <div class="sub" id="today">—</div>
-  <div class="rule"></div>
+ <div class="track" id="track">
 
-  <div class="wheelwrap">
-    <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Колесо года"></svg>
-  </div>
-
-  <div class="banner">
-    <div class="nextname" id="nextName">—</div>
-    <div class="nextdate" id="nextDate">—</div>
-    <div class="count"><span id="days">—</span><small>дней до порога</small></div>
-    <div class="bar"><i id="progress" style="width:0%"></i></div>
-  </div>
-
-  <div class="tip">
-    <b>Совет дня</b>
-    <span id="tipText">—</span>
-  </div>
-
-
-  <div class="rune">
-    <b>Руна дня</b>
-    <div class="runeinner">
-      <svg id="runeGlyph" viewBox="0 0 200 180" role="img" aria-label="руна дня"></svg>
-      <div class="runetxt">
-        <div class="runename" id="runeName">—</div>
-        <div class="runemean" id="runeMean">—</div>
-      </div>
+  <section class="screen">
+    <h1>Колесо года</h1>
+    <div class="sub" id="today">—</div>
+    <div class="rule"></div>
+    <div class="wheelwrap">
+      <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Колесо года"></svg>
     </div>
-    <div class="src">старший футарк, 24 руны. Имена и смыслы — из англосаксонской и норвежской рунических поэм. Это не гадание о будущем: руна дня одна на все сутки и тянется по дате.</div>
-  </div>
-
-  <div class="card">
-    <b>Карта дня</b>
-    <div class="cardinner">
-      <svg id="cardFace" viewBox="0 0 52 76" role="img" aria-label="карта дня"></svg>
-      <div class="cardtxt">
-        <div class="cardname" id="cardName">—</div>
-        <div class="cardmean" id="cardMean">—</div>
-      </div>
+    <div class="banner">
+      <div class="nextname" id="nextName">—</div>
+      <div class="nextdate" id="nextDate">—</div>
+      <div class="count"><span id="days">—</span><small>дней до порога</small></div>
+      <div class="bar"><i id="progress" style="width:0%"></i></div>
     </div>
-    <div class="src">36 декад зодиака — 36 младших арканов (система Золотой Зари, 1888). Каждая карта держит свой промежуток, поэтому карта дня здесь не тянется случайно, а сменяется по календарю. Старшие арканы дат не имеют: 22 карты привязаны к планетам и знакам, не к числам, — их я в календарь не ставлю.</div>
-  </div>
+    <div class="tip">
+      <b>Совет дня</b>
+      <span id="tipText">—</span>
+    </div>
+  </section>
 
-  <div class="guard">
-    <b>Покровители порога</b>
-    <div class="grow"><span class="gk">Зверь</span><span class="gv" id="beastName">—</span></div>
-    <div class="gmean" id="beastMean">—</div>
-    <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
-    <div class="gmean" id="treeMean">—</div>
-    <div class="src">зверь — славянский календарь: жаворонки на Сорок мучеников (22.03), пчела на Зосиму-пчельника (30.04), кукушка кукует до Петрова дня (12.07), коням роздых на Ильин день (2.08), журавли уходят на Арину (1.10), ворон на Дмитриевские деды (8.11), волчьи свадьбы в январе, медведь на Спиридона-солнцеворота (25.12). дерево — огамический календарь деревьев, реконструкция Роберта Грейвса (1952).</div>
-  </div>
+  <section class="screen">
+    <div class="pagetitle">Руна дня</div>
+    <div class="rune">
+      <div class="runeinner">
+        <svg id="runeGlyph" viewBox="0 0 200 180" role="img" aria-label="руна дня"></svg>
+        <div class="runetxt">
+          <div class="runename" id="runeName">—</div>
+          <div class="runemean" id="runeMean">—</div>
+        </div>
+      </div>
+      <div class="src">Двадцать четыре руны старшего футарка. Каждой руне достаётся один день, и руна идёт по календарю, а не тянется наугад. Это не пророчество: это короткая мысль на сутки, чтобы было за что зацепиться.</div>
+    </div>
+  </section>
 
-  <div class="astro">
-    <b>Небо</b>
-    <ul id="astroList"></ul>
-  </div>
+  <section class="screen">
+    <div class="pagetitle">Карта дня</div>
+    <div class="card">
+      <div class="cardinner">
+        <svg id="cardFace" viewBox="0 0 52 76" role="img" aria-label="карта дня"></svg>
+        <div class="cardtxt">
+          <div class="cardname" id="cardName">—</div>
+          <div class="cardmean" id="cardMean">—</div>
+        </div>
+      </div>
+      <div class="src">Тридцать шесть младших арканов, и у каждого свой кусок года. Поэтому карта сменяется по календарю, а не случайно. Старшие арканы к числам не привязаны, и я их в календарь не ставлю: пусть молчат, чем соврут.</div>
+    </div>
 
-  <div class="foot">колесо живёт само, обновляется при открытии</div>
+    <div class="pagetitle" style="margin-top:20px">Покровители порога</div>
+    <div class="guard">
+      <div class="grow"><span class="gk">Зверь</span><span class="gv" id="beastName">—</span></div>
+      <div class="gmean" id="beastMean">—</div>
+      <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
+      <div class="gmean" id="treeMean">—</div>
+      <div class="src">Зверь держится народного календаря: жаворонки к Сорока мученикам (22.03), пчела к Зосиме (30.04), кукушка кукует до Петрова дня, кони отдыхают на Ильин день, журавли уходят к Арине (1.10), ворон выходит с первым снегом, волчьи свадьбы в январе, медведь ворочается на Спиридона (25.12). Дерево — огамический календарь, реконструкция Роберта Грейвса.</div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="pagetitle">Звезда магов</div>
+    <div class="star"><svg id="starSvg" viewBox="0 0 260 260" role="img" aria-label="звезда магов"></svg></div>
+    <div class="starrow">
+      <div class="k">Сегодня</div>
+      <div class="v" id="starDay">—</div>
+      <p id="starOk">—</p>
+      <p id="starNo">—</p>
+    </div>
+    <div class="src">Семь лучей, семь планет, семь дней. Порядок — халдейский ряд (Сатурн, Юпитер, Марс, Солнце, Венера, Меркурий, Луна), тот самый, из которого выросла семидневная неделя. Дни и их свойства — по «Звезде магов» (astrolus.ru). Это традиция, а не наука: берите как настроение дня, не как расписание.</div>
+  </section>
+
+  <section class="screen">
+    <div class="pagetitle">Луна</div>
+    <div class="moonbox">
+      <div class="glyph" id="moonGlyph">🌑</div>
+      <div class="nm" id="moonName">—</div>
+      <div class="sub2" id="moonAge">—</div>
+      <div class="moonrows">
+        <div><b id="moonLight">—</b>освещено</div>
+        <div><b id="moonNext">—</b>до смены</div>
+      </div>
+      <div class="moontip" id="moonTip">—</div>
+    </div>
+    <div class="src">Считано по синодическому месяцу (29,53 дня) от новолуния 6 января 2000 года. Точность около суток, у границы фазы может разойтись с таблицей. Если нужен день в день — сверьтесь с лунным календарём (starwalk.space/ru/moon-calendar).</div>
+  </section>
+
+  <section class="screen">
+    <div class="pagetitle">Небо</div>
+    <div class="astro">
+      <ul id="astroList"></ul>
+    </div>
+    <div class="foot">колесо живёт само, обновляется при открытии<br>листайте вбок</div>
+  </section>
+
+ </div>
+ <div class="dots" id="dots"></div>
 </div>
 
 <script>
@@ -508,7 +574,7 @@ const BEASTS = [
   [6,21,"Кукушка","кукует до Петрова дня, потом молчит: срок у голоса короткий"],
   [8,1,"Конь","на Ильин день коням роздых: работа без отдыха кончается срывом"],
   [9,22,"Журавль","на Арину уходят на юг: уходит и год, смотри, что осталось в руках"],
-  [10,31,"Ворон","на Дмитриевские деды его видят у поминальных костров: память держит дом"],
+  [10,31,"Ворон","ворон выходит к первому снегу: он раньше всех знает, что зима настоящая"],
   [12,21,"Волк","в январе волчьи свадьбы: голодный ходит по кругу, не приближайся"]
 ];
 
@@ -750,7 +816,142 @@ function drawWheel(items, todayDOY, yearLen, next){
   g.appendChild(knob);
 }
 
+/* ---------- звезда магов: халдейский ряд и дни недели ---------- */
+const CHALDEAN = ["Сатурн","Юпитер","Марс","Солнце","Венера","Меркурий","Луна"];
+const DAYS7 = [
+ {n:"воскресенье", p:"Солнце", z:"Лев", col:"золотой, тёплый жёлтый", met:"золото", st:"янтарь, сердолик",
+  ok:"показывать себя, звать людей, начинать то, что должно быть на виду",
+  no:"прятаться и мельчить: сегодняшний день для света, а не для тайны"},
+ {n:"понедельник", p:"Луна", z:"Рак", col:"серебристый, светлый", met:"серебро", st:"жемчуг, лунный камень",
+  ok:"дом, вода, сон, забота о своих, большая стирка и уборка",
+  no:"подписывать важное и спорить: чувства сегодня громче доводов"},
+ {n:"вторник", p:"Марс", z:"Овен, Скорпион", col:"красный, ржавый", met:"железо", st:"рубин, гранат",
+  ok:"работа руками, спорт, ремонт, разобрать завал",
+  no:"затевать ссору ради ссоры: огня хватает, злости не надо"},
+ {n:"среда", p:"Меркурий", z:"Близнецы, Дева", col:"серый, пёстрый", met:"ртуть", st:"агат, халцедон",
+  ok:"письма, счёт, разговоры, бумаги, дорога по мелочи",
+  no:"верить слуху на слово: сегодня всё двоится"},
+ {n:"четверг", p:"Юпитер", z:"Стрелец, Рыбы", col:"синий, фиолетовый", met:"олово", st:"сапфир, бирюза",
+  ok:"просить, учиться, договариваться о большом, помогать другим",
+  no:"обещать больше, чем сможешь: слово сегодня растёт"},
+ {n:"пятница", p:"Венера", z:"Телец, Весы", col:"розовый, зелёный", met:"медь", st:"изумруд, нефрит",
+  ok:"мириться, украшать, дарить, встречаться, выбирать красивое",
+  no:"считать деньги наспех: рука сегодня мягкая"},
+ {n:"суббота", p:"Сатурн", z:"Козерог, Водолей", col:"чёрный, тёмно-синий", met:"свинец", st:"оникс, обсидиан",
+  ok:"порядок, счёт, границы, закончить старое и отпустить",
+  no:"начинать новое: сегодня закрывают, а не открывают"}
+];
+
+function drawStar(){
+  const NS="http://www.w3.org/2000/svg";
+  const svg=document.getElementById('starSvg');
+  if(!svg) return;
+  svg.innerHTML='';
+  const cx=130, cy=130, R=84;
+  const pt=i=>{const a=-Math.PI/2 + i*2*Math.PI/7; return [cx+R*Math.cos(a), cy+R*Math.sin(a)];};
+  for(let i=0;i<7;i++){
+    const [x1,y1]=pt(i), [x2,y2]=pt((i+3)%7);
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#8a6a33');l.setAttribute('stroke-width','1');
+    l.setAttribute('opacity','.75');
+    svg.appendChild(l);
+  }
+  const ring=document.createElementNS(NS,'circle');
+  ring.setAttribute('cx',cx);ring.setAttribute('cy',cy);ring.setAttribute('r',R);
+  ring.setAttribute('fill','none');ring.setAttribute('stroke','#b99c62');
+  ring.setAttribute('stroke-width','.7');ring.setAttribute('stroke-dasharray','2 4');
+  svg.appendChild(ring);
+
+  const today=DAYS7[new Date().getDay()];
+  CHALDEAN.forEach((name,i)=>{
+    const [x,y]=pt(i);
+    const a=-Math.PI/2 + i*2*Math.PI/7;
+    const isToday = name===today.p;
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',isToday?4.6:3);
+    c.setAttribute('fill',isToday?'#7b2c1d':'#a8762b');
+    svg.appendChild(c);
+    const t=document.createElementNS(NS,'text');
+    const lx=cx+(R+17)*Math.cos(a), ly=cy+(R+17)*Math.sin(a);
+    t.setAttribute('x',lx);t.setAttribute('y',ly+3);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('font-family','Georgia,serif');
+    t.setAttribute('font-size',isToday?'10.5':'9.5');
+    t.setAttribute('fill',isToday?'#7b2c1d':'#5b4222');
+    if(isToday) t.setAttribute('font-weight','700');
+    t.textContent=name;
+    svg.appendChild(t);
+  });
+
+  const names=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  document.getElementById('starDay').textContent =
+    today.n[0].toUpperCase()+today.n.slice(1)+' · день '+today.p+' · '+today.z;
+  document.getElementById('starOk').innerHTML = '<b>хорошо</b>  '+today.ok;
+  document.getElementById('starNo').innerHTML = '<b>лучше не</b>  '+today.no+'<br><span style="opacity:.75">цвет дня: '+today.col+'; металл: '+today.met+'; камни: '+today.st+'</span>';
+}
+
+/* ---------- луна ---------- */
+const SYN=29.530588853, NEW_EPOCH=Date.UTC(2000,0,6,18,14);
+const MOON_GLYPH=["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘"];
+const MOON_NAME=["новолуние","молодая луна","первая четверть","прибывающая луна","полнолуние","убывающая луна","последняя четверть","старая луна"];
+const MOON_NOTE=[
+ "день тишины: не начинай, а задумай",
+ "задумай и посади: малое уже пошло в рост",
+ "первый ровный шаг: сделай то, что обещал себе",
+ "силы прибавляются: доводи до конца начатое",
+ "всё видно: покажи сделанное, позови людей",
+ "пора отдавать: делись, а не держи в кулаке",
+ "остановка: подведи счёт, не подписывай нового",
+ "убирай: долги, сор, лишние слова"];
+
+function drawMoon(){
+  const now=new Date();
+  const days=(now.getTime()-NEW_EPOCH)/86400000;
+  const age=((days%SYN)+SYN)%SYN;
+  const idx=Math.round(age/SYN*8)%8;
+  const light=Math.round((1-Math.cos(2*Math.PI*age/SYN))/2*100);
+  const waxing = age < SYN/2;
+  const d = waxing ? Math.round(SYN/2-age) : Math.round(SYN-age);
+  document.getElementById('moonGlyph').textContent=MOON_GLYPH[idx];
+  document.getElementById('moonName').textContent=MOON_NAME[idx];
+  document.getElementById('moonAge').textContent=Math.round(age)+' '+plural(Math.round(age))+' от новолуния';
+  document.getElementById('moonLight').textContent=light+'%';
+  document.getElementById('moonNext').textContent=d+' '+plural(d);
+  document.getElementById('moonTip').textContent=MOON_NOTE[idx];
+}
+
+/* ---------- листание ---------- */
+function initPager(){
+  const track=document.getElementById('track');
+  const dots=document.getElementById('dots');
+  const screens=[].slice.call(track.querySelectorAll('.screen'));
+  dots.innerHTML='';
+  screens.forEach(function(sc,i){
+    const d=document.createElement('i');
+    d.addEventListener('click',function(){
+      track.scrollTo({left:i*track.clientWidth,behavior:'smooth'});
+    });
+    dots.appendChild(d);
+  });
+  const mark=function(){
+    const i=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
+    [].forEach.call(dots.children,function(d,k){ d.className = (k===i?'on':''); });
+  };
+  let t=null;
+  track.addEventListener('scroll',function(){ clearTimeout(t); t=setTimeout(mark,60); });
+  window.addEventListener('resize',mark);
+  mark();
+  const hp = /^#p(\d+)$/.exec(location.hash);
+  if(hp){ const k=parseInt(hp[1],10)-1; if(screens[k]) track.scrollLeft = k*track.clientWidth; mark(); }
+}
+
+
 build();
+drawStar();
+drawMoon();
+initPager();
 </script>
 </body>
 </html>
