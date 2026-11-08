@@ -923,7 +923,7 @@ const MOON_NOTE=[
  "остановка: подведи счёт, не подписывай нового",
  "убирай: долги, сор, лишние слова"];
 
-const TREES=[
+const OGHAM=[
  {og:'ᚁ',n:'Берёза',lat:'beith',m1:'24.12',m2:'20.01',mean:'чистый лист: новое, дом, защита того, что только началось'},
  {og:'ᚂ',n:'Рябина',lat:'luis',m1:'21.01',m2:'17.02',mean:'зоркость и оберег: свой глаз зорче чужого'},
  {og:'ᚅ',n:'Ясень',lat:'nion',m1:'18.02',m2:'17.03',mean:'связь верха и низа: слово, которое держит'},
@@ -941,8 +941,8 @@ const TREES=[
 function treeToday(){
   const t=new Date();
   const md=(t.getMonth()+1)*100+t.getDate();
-  for(let i=0;i<TREES.length;i++){
-    const a=TREES[i], p=a.m1.split('.'), q=a.m2.split('.');
+  for(let i=0;i<OGHAM.length;i++){
+    const a=OGHAM[i], p=a.m1.split('.'), q=a.m2.split('.');
     const s=+p[1]*100+(+p[0]), e=+q[1]*100+(+q[0]);
     if(s<e){ if(md>=s&&md<=e) return i; } else { if(md>=s||md<=e) return i; }
   }
@@ -952,7 +952,7 @@ function drawTrees(){
   const box=document.getElementById('treeList');
   if(!box) return;
   const k=treeToday();
-  box.innerHTML=TREES.map(function(a,i){
+  box.innerHTML=OGHAM.map(function(a,i){
     return '<div class="trow'+(i===k?' on':'')+'">'
       +'<div class="tog">'+a.og+'</div>'
       +'<div class="tmain"><div class="tname">'+a.n+'<small>'+a.lat+'</small></div>'
