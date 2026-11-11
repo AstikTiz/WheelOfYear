@@ -220,10 +220,133 @@
   .moonrows div{font-size:13px;color:#3a2a16}
   .moonrows b{display:block;font-size:15px;color:var(--red);letter-spacing:.03em}
   .moontip{margin-top:12px;font-size:13.5px;line-height:1.5;color:#3a2a16;font-style:italic}
+
+  /* ================= тема, зелень, гримуар ================= */
+  :root[data-theme="dark"]{
+    --parch:#1b2a20;--parch2:#16221b;--ink:#e9efdf;--ochre:#cfa869;--red:#e0a86c;
+    --moss:#8fae86;--gold:#d8bb78;
+  }
+  :root[data-theme="dark"] body{background-color:#0a0f0c}
+  :root[data-theme="dark"] .scroll{
+    background:
+      radial-gradient(circle at 20% 8%, rgba(255,255,255,.05), transparent 40%),
+      radial-gradient(circle at 82% 92%, rgba(120,160,110,.12), transparent 45%),
+      repeating-linear-gradient(90deg, rgba(200,220,190,.03) 0 2px, transparent 2px 7px),
+      linear-gradient(170deg,rgba(30,42,34,.96) 0%,rgba(23,33,27,.97) 55%,rgba(18,27,22,.98) 100%);
+    box-shadow:0 0 0 1px rgba(150,180,140,.18),0 18px 44px rgba(0,0,0,.6),inset 0 0 42px rgba(0,0,0,.35);
+  }
+  :root[data-theme="dark"] .scroll:before,
+  :root[data-theme="dark"] .scroll:after{background:linear-gradient(180deg,#2c3d30,#1a271d 40%,#2b3c2f)}
+  :root[data-theme="dark"] .tip,
+  :root[data-theme="dark"] .rune,
+  :root[data-theme="dark"] .card,
+  :root[data-theme="dark"] .guard,
+  :root[data-theme="dark"] .starrow,
+  :root[data-theme="dark"] .moonbox,
+  :root[data-theme="dark"] .noteform{background:rgba(255,255,255,.045);border-color:rgba(180,205,170,.22)}
+  :root[data-theme="dark"] .runemean,
+  :root[data-theme="dark"] .cardmean,
+  :root[data-theme="dark"] .gmean,
+  :root[data-theme="dark"] .starrow p,
+  :root[data-theme="dark"] .moontip,
+  :root[data-theme="dark"] .tmean,
+  :root[data-theme="dark"] .astro .w,
+  :root[data-theme="dark"] .entry p{color:#d6e0d2}
+  :root[data-theme="dark"] .src,
+  :root[data-theme="dark"] .tdate,
+  :root[data-theme="dark"] .astro .dates,
+  :root[data-theme="dark"] .entry .meta{color:rgba(200,220,190,.62)}
+  :root[data-theme="dark"] .astro li.sky b{color:#e2ead9}
+  :root[data-theme="dark"] .astro li.sky.on b{color:#f0b98a}
+  :root[data-theme="dark"] .dots i{background:rgba(200,220,190,.25)}
+  :root[data-theme="dark"] .entry{background:rgba(255,255,255,.05);border-left-color:rgba(180,205,170,.4)}
+
+  .themebtn{
+    position:absolute;bottom:9px;right:12px;z-index:9;width:34px;height:34px;border-radius:50%;
+    border:1px solid rgba(168,118,43,.45);background:rgba(255,250,235,.7);color:#7b2c1d;
+    font:inherit;font-size:16px;line-height:1;cursor:pointer;padding:0;
+  }
+  :root[data-theme="dark"] .themebtn{background:rgba(40,55,45,.92);color:#e6d8b8;border-color:rgba(180,205,170,.3)}
+
+  .airspace{height:26px}
+  .vines{
+    height:54px;margin:10px 0 0;opacity:.6;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 60' preserveAspectRatio='none'%3E%3Cg fill='%234c5c38'%3E%3Cpolygon points='20,58 20,16 34,44 48,16 48,58'/%3E%3Cpolygon points='60,58 60,26 72,50 84,26 84,58'/%3E%3Cpolygon points='96,58 96,8 112,40 128,8 128,58'/%3E%3Cpolygon points='140,58 140,24 152,48 164,24 164,58'/%3E%3Cpolygon points='176,58 176,14 190,42 204,14 204,58'/%3E%3Cpath d='M0 58 C 30 44, 60 50, 90 58 C 120 50, 160 44, 240 58 Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:100% 100%;background-repeat:no-repeat;
+  }
+  :root[data-theme="dark"] .vines{opacity:.42;filter:brightness(1.5)}
+
+  .tabs{display:flex;gap:6px;justify-content:center;margin:2px 0 12px;flex-wrap:wrap}
+  .tabs button{font:inherit;font-size:12px;letter-spacing:.06em;padding:7px 12px;border-radius:999px;
+    border:1px solid rgba(168,118,43,.4);background:rgba(255,250,235,.5);color:#7b2c1d;cursor:pointer}
+  .tabs button.active{background:var(--red);color:#f7ecd4;border-color:transparent}
+  :root[data-theme="dark"] .tabs button{background:rgba(255,255,255,.06);color:#e9efdf;border-color:rgba(180,205,170,.22)}
+  :root[data-theme="dark"] .tabs button.active{background:#8fae86;color:#14201a}
+
+  .noteform{margin:0 4px;padding:12px 13px;border:1px solid rgba(168,118,43,.35);border-radius:4px;background:rgba(255,250,235,.5)}
+  .noteform label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ochre);margin:10px 0 4px}
+  .noteform label:first-child{margin-top:0}
+  .noteform input,.noteform textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);
+    background:rgba(255,255,255,.45);border:1px solid rgba(168,118,43,.3);border-radius:4px;padding:8px 9px}
+  :root[data-theme="dark"] .noteform input,
+  :root[data-theme="dark"] .noteform textarea{background:rgba(0,0,0,.25);border-color:rgba(180,205,170,.22);color:#e9efdf}
+  .noteform textarea{min-height:104px;resize:vertical}
+
+  .btn{display:inline-block;font:inherit;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;
+    border:1px solid transparent;background:var(--red);color:#fdf3dd;margin-top:12px}
+  .btn.ghost{background:transparent;color:var(--red);border-color:rgba(168,118,43,.45)}
+  :root[data-theme="dark"] .btn{background:#8fae86;color:#132019}
+  :root[data-theme="dark"] .btn.ghost{background:transparent;color:#cfe0c6;border-color:rgba(180,205,170,.3)}
+
+  .notebar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 4px 0}
+  .notebar .btn{margin-top:0}
+
+  .noteart{margin:12px 2px 0;padding:8px 6px 10px;border-radius:6px;background-position:center;background-size:cover;background-repeat:no-repeat;border:1px solid rgba(168,118,43,.25)}
+  .daygroup{margin:6px 2px 12px}
+  .daygroup h4{margin:0 0 6px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ochre);
+    border-bottom:1px solid rgba(168,118,43,.25);padding-bottom:5px}
+  .entry{margin:8px 0;padding:10px 12px;border-left:3px solid rgba(168,118,43,.55);background:rgba(255,250,235,.55);border-radius:0 4px 4px 0}
+  .entry h5{margin:0 0 4px;font-size:13.5px;color:var(--red);letter-spacing:.03em}
+  .entry .meta{font-size:10.5px;color:rgba(80,55,25,.72);margin-bottom:5px}
+  .entry p{margin:0;font-size:13.5px;line-height:1.5;white-space:pre-wrap;color:#3a2a16}
+  .noteart .cathead{margin:16px 0 8px;text-align:center;font-size:12px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--red);font-weight:600}
+  .entry .del{float:right;border:0;background:transparent;color:rgba(80,55,25,.5);font-size:14px;cursor:pointer;padding:0 2px}
+  .empty{font-size:12.5px;color:rgba(80,55,25,.65);text-align:center;margin:14px 0}
+
+  .pad{margin:0 4px}
+  #runeCanvas{display:block;width:100%;height:320px;border:1px solid rgba(168,118,43,.4);border-radius:4px;
+    background:rgba(255,250,235,.55);touch-action:none;cursor:crosshair}
+  :root[data-theme="dark"] #runeCanvas{background:rgba(0,0,0,.3);border-color:rgba(180,205,170,.25)}
+  .padrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 6px 0;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--ochre)}
+  .padrow input[type=color]{width:40px;height:30px;padding:0;border:1px solid rgba(168,118,43,.4);border-radius:6px;background:transparent;vertical-align:middle}
+  .padrow select{font:inherit;font-size:12px;color:var(--ink);background:rgba(255,255,255,.5);
+    border:1px solid rgba(168,118,43,.35);border-radius:4px;padding:5px 6px}
+  :root[data-theme="dark"] .padrow select{background:rgba(0,0,0,.25);color:#e9efdf;border-color:rgba(180,205,170,.25)}
+  #printHead{display:none}
+
+  @media print{
+    html,body{background:#fff!important;color:#222;overflow:visible;display:block;padding:0;height:auto}
+    .scroll{height:auto!important;max-width:none;box-shadow:none;background:#fff!important;padding:0;border-radius:0}
+    .scroll:before,.scroll:after,.themebtn,.dots,.vines,.notebar,.noteform,#noteTabs,.pagetitle,#grimoire>.src{display:none!important}
+    .track{display:block;overflow:visible;height:auto}
+    .track>.screen{display:none!important;height:auto;overflow:visible;padding:0}
+    .track>.screen#grimoire{display:block!important}
+    #printHead{display:block;text-align:center;font-size:16px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 14px;color:#333}
+    .noteart{background:none!important;border:0;padding:0}
+    .daygroup h4{color:#444;border-bottom:1px solid #bbb}
+    .entry{background:#fff;border-left:2px solid #999;break-inside:avoid;page-break-inside:avoid}
+    .entry h5,.entry p{color:#222}
+    .entry .meta{color:#555}
+    .entry .del{display:none!important}
+  }
+
 </style>
 </head>
 <body>
 <div class="scroll">
+ <button class="themebtn" id="themeBtn" aria-label="Сменить тему" title="Светлая / тёмная">☾</button>
  <div class="track" id="track">
 
   <section class="screen">
@@ -243,6 +366,9 @@
       <b>Совет дня</b>
       <span id="tipText">—</span>
     </div>
+    <div class="airspace"></div>
+    <div class="vines" aria-hidden="true"></div>
+    <div class="airspace"></div>
   </section>
 
   <section class="screen">
@@ -278,7 +404,7 @@
       <div class="gmean" id="beastMean">—</div>
       <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
       <div class="gmean" id="treeMean">—</div>
-      <div class="src">Зверь держится народного календаря: жаворонки к Сорока мученикам (22.03), пчела к Зосиме (30.04), кукушка кукует до Петрова дня, кони отдыхают на Ильин день, журавли уходят к Арине (1.10), ворон выходит с первым снегом, волчьи свадьбы в январе, медведь ворочается на Спиридона (25.12). Дерево — огамический календарь, реконструкция Роберта Грейвса.</div>
+      <div class="src">Зверь идёт по живым приметам, без имён и святых: первый снег, первый мёд, отлёт журавлей, тишина кукушки. Примета проверяется глазом, а не книгой. Дерево — огамический календарь, реконструкция Роберта Грейвса, 1948 год.</div>
     </div>
   </section>
 
@@ -313,6 +439,55 @@
       <div class="moontip" id="moonTip">—</div>
     </div>
     <div class="src">Считано по синодическому месяцу (29,53 дня) от новолуния 6 января 2000 года. Точность около суток, у границы фазы может разойтись с таблицей. Если нужен день в день — сверьтесь с лунным календарём (starwalk.space/ru/moon-calendar).</div>
+  </section>
+
+  <section class="screen" id="runes">
+    <div class="pagetitle">Мастерская рун</div>
+    <div class="pad">
+      <canvas id="runeCanvas" aria-label="Поле для рисования руны"></canvas>
+    </div>
+    <div class="padrow">
+      <label>Цвет <input type="color" id="penColor" value="#7b2c1d"></label>
+      <label>Толщина
+        <select id="penWidth">
+          <option value="3">тонкая</option>
+          <option value="6" selected>средняя</option>
+          <option value="11">широкая</option>
+        </select>
+      </label>
+    </div>
+    <div class="notebar">
+      <button class="btn ghost" id="clearRune">Очистить</button>
+      <button class="btn" id="saveRune">Сохранить рисунок</button>
+    </div>
+    <div class="src">Рисуется пальцем или мышью, без спешки и без оценки. Разбора нарисованного здесь пока нет: я не хочу угадывать за тебя. Когда придумаю, как читать линии честно, — добавлю.</div>
+  </section>
+
+  <section class="screen" id="grimoire">
+    <div class="pagetitle">Странички гримуара</div>
+    <div class="tabs" id="noteTabs">
+      <button data-cat="Кристаллы" class="active">Кристаллы</button>
+      <button data-cat="Зелья">Зелья</button>
+      <button data-cat="Духи">Духи</button>
+    </div>
+    <div class="noteform">
+      <label for="noteDate">Дата записи</label>
+      <input type="date" id="noteDate">
+      <label for="noteEvent">Астрономическое событие (если есть)</label>
+      <input type="text" id="noteEvent" placeholder="полнолуние, ретроград Меркурия…">
+      <label for="noteText">Заметка · <span id="noteCat">Кристаллы</span></label>
+      <textarea id="noteText" placeholder="наблюдение, рецепт, что сработало, что нет"></textarea>
+      <button class="btn" id="saveNote">Сохранить запись</button>
+    </div>
+    <div class="notebar">
+      <button class="btn ghost" id="exportPdf">Блокнот в PDF</button>
+      <button class="btn ghost" id="clearAll">Стереть всё</button>
+    </div>
+    <div class="noteart" id="noteArt">
+      <div id="printHead">Странички гримуара</div>
+      <div id="noteList"></div>
+    </div>
+    <div class="src">Записи живут на этом устройстве, без облака и без аккаунта. Экспорт в PDF: откроется системное окно печати, выбери «Сохранить как PDF».</div>
   </section>
 
   <section class="screen">
@@ -415,12 +590,14 @@ function build(){
   /* ---------- advice ---------- */
   const phase = frac < .2 ? "порог пройден" : frac < .55 ? "рост" : frac < .85 ? "полнота" : "собирание";
   const TIPS = {
-    "порог пройден": `Год только повернулся. Не беги. ${next.gen} ещё далеко, а семя уже в земле.`,
+    "порог пройден": `Год только повернулся. Не беги. ${next.name === "Йоль" ? "Йоль" : next.gen} ещё далеко, а семя уже в земле.`,
     "рост": `Середина между ${prevGen(items,prev.doy)} и ${next.gen}. Время делать, не обсуждать.`,
     "полнота": `До ${next.gen} ${daysLeft} ${plural(daysLeft)}. Самая узкая часть колеса. Проверь, что начал: живо оно или уже нет.`,
     "собирание": `До ${next.gen} ${daysLeft} ${plural(daysLeft)}, и это счёт. Доделай, отпусти, освободи место.`
   };
-  document.getElementById('tipText').textContent = TIPS[phase];
+  document.getElementById('tipText').textContent = daysLeft === 0
+    ? `Сегодня ${next.name}. Если эта традиция тебе близка — время ритуалов: свеча, тишина, стол, что-то живое на нём. Если нет — просто отметь, что год повернулся.`
+    : TIPS[phase];
 
   /* ---------- sky ---------- */
   const ul = document.getElementById('astroList');
@@ -585,12 +762,12 @@ const DECAN = ["Овен","Овен","Овен","Телец","Телец","Те�
 
 /* ---------- зверь: славянский календарь, привязан к началу порога ---------- */
 const BEASTS = [
-  [2,2,"Медведь","просыпается на Спиридона-солнцеворота: сначала бок, потом лапа"],
-  [3,20,"Жаворонок","на Сорок мучеников его пекут из теста: весну зовут руками"],
-  [5,1,"Пчела","на Зосиму-пчельника выставляют ульи: дело начинают, когда тепло, а не когда хочется"],
-  [6,21,"Кукушка","кукует до Петрова дня, потом молчит: срок у голоса короткий"],
-  [8,1,"Конь","на Ильин день коням роздых: работа без отдыха кончается срывом"],
-  [9,22,"Журавль","на Арину уходят на юг: уходит и год, смотри, что осталось в руках"],
+  [2,2,"Медведь","просыпается на солнцевороте: сначала бок, потом лапа"],
+  [3,20,"Жаворонок","возвращается с первым теплом: весну зовут голосом, а не календарём"],
+  [5,1,"Пчела","выходит на первый мёд: дело начинают, когда тепло, а не когда хочется"],
+  [6,21,"Кукушка","кукует в начале лета, потом молчит: срок у голоса короткий"],
+  [8,1,"Конь","в жару коням роздых: работа без отдыха кончается срывом"],
+  [9,22,"Журавль","уходит на юг: уходит и год, смотри, что осталось в руках"],
   [10,31,"Ворон","ворон выходит к первому снегу: он раньше всех знает, что зима настоящая"],
   [12,21,"Волк","в январе волчьи свадьбы: голодный ходит по кругу, не приближайся"]
 ];
@@ -1008,6 +1185,221 @@ drawStar();
 drawMoon();
 drawTrees();
 initPager();
+
+/* ---------- тема ---------- */
+(function(){
+  const btn=document.getElementById('themeBtn');
+  function set(t){
+    if(t==='dark') document.documentElement.dataset.theme='dark';
+    else document.documentElement.removeAttribute('data-theme');
+    btn.textContent = t==='dark' ? '☀' : '☾';
+    try{ localStorage.setItem('woy-theme',t); }catch(e){}
+    window.dispatchEvent(new Event('woy-theme'));
+  }
+  let saved='light'; try{ saved=localStorage.getItem('woy-theme')||'light'; }catch(e){}
+  set(saved);
+  btn.addEventListener('click',function(){
+    set(document.documentElement.dataset.theme==='dark'?'light':'dark');
+  });
+})();
+
+/* ---------- мастерская рун ---------- */
+(function(){
+  const canvas=document.getElementById('runeCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let drawing=false,last=null;
+  function fit(){
+    const r=Math.max(1,window.devicePixelRatio||1);
+    const box=canvas.getBoundingClientRect();
+    if(!box.width) return;
+    const prev=document.createElement('canvas');
+    prev.width=canvas.width; prev.height=canvas.height;
+    if(canvas.width&&canvas.height) prev.getContext('2d').drawImage(canvas,0,0);
+    canvas.width=Math.round(box.width*r);
+    canvas.height=Math.round(box.height*r);
+    ctx.setTransform(r,0,0,r,0,0);
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    if(prev.width&&prev.height) ctx.drawImage(prev,0,0,prev.width,prev.height,0,0,box.width,box.height);
+  }
+  function pt(e){
+    const b=canvas.getBoundingClientRect();
+    return {x:e.clientX-b.left, y:e.clientY-b.top};
+  }
+  canvas.addEventListener('pointerdown',function(e){
+    drawing=true; last=pt(e);
+    try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault();
+  });
+  canvas.addEventListener('pointermove',function(e){
+    if(!drawing) return;
+    const p=pt(e);
+    ctx.strokeStyle=document.getElementById('penColor').value;
+    ctx.lineWidth=Number(document.getElementById('penWidth').value);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+    last=p; e.preventDefault();
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){
+    canvas.addEventListener(ev,function(){ drawing=false; last=null; });
+  });
+  document.getElementById('clearRune').addEventListener('click',function(){
+    const r=Math.max(1,window.devicePixelRatio||1);
+    ctx.clearRect(0,0,canvas.width/r,canvas.height/r);
+  });
+  document.getElementById('saveRune').addEventListener('click',function(){
+    const name='runa-'+new Date().toISOString().slice(0,10)+'.png';
+    const url=canvas.toDataURL('image/png');
+    if(window.Koleso && window.Koleso.savePng){
+      window.Koleso.savePng(name, url.split(',')[1]);
+    }else{
+      const a=document.createElement('a'); a.download=name; a.href=url; a.click();
+    }
+  });
+  fit();
+  window.addEventListener('resize',function(){ setTimeout(fit,120); });
+  window.addEventListener('woy-theme',function(){ /* canvas keeps its ink */ });
+})();
+
+/* ---------- странички гримуара ---------- */
+(function(){
+  const list=document.getElementById('noteList');
+  if(!list) return;
+  const KEY='woy-grimoire';
+  const ART={
+    'Кристаллы':'images/grimoire-crystals.png',
+    'Зелья':'images/grimoire-potions.png',
+    'Духи':'images/grimoire-spirits.png'
+  };
+  const ART_DEFAULT='images/grimoire-parchment.png';
+  let category='Кристаллы';
+
+  function read(){
+    try{ const v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v:[]; }
+    catch(e){ return []; }
+  }
+  function write(arr){
+    try{ localStorage.setItem(KEY,JSON.stringify(arr)); return true; }
+    catch(e){ return false; }
+  }
+  function moonNameAt(dateStr){
+    const t=Date.parse(dateStr+'T12:00:00');
+    if(isNaN(t)) return '—';
+    const days=(t-NEW_EPOCH)/86400000;
+    const age=((days%SYN)+SYN)%SYN;
+    return MOON_NAME[Math.round(age/SYN*8)%8];
+  }
+  function paintArt(){
+    const art=document.getElementById('noteArt');
+    const dark=document.documentElement.dataset.theme==='dark';
+    const tint=dark
+      ? 'linear-gradient(rgba(18,30,23,.86),rgba(18,30,23,.86))'
+      : 'linear-gradient(rgba(249,247,233,.86),rgba(249,247,233,.86))';
+    art.style.backgroundImage=tint+',url("'+(ART[category]||ART_DEFAULT)+'")';
+  }
+  function fmtDay(d){
+    const p=d.split('-').map(Number);
+    if(p.length!==3||p.some(isNaN)) return d;
+    return new Date(p[0],p[1]-1,p[2]).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  }
+  function rowSort(a,b){ return b.date.localeCompare(a.date) || (b.created||0)-(a.created||0); }
+  function render(mode){
+    const all=read();
+    paintArt();
+    list.innerHTML='';
+    const cats = mode==='all' ? ['Кристаллы','Зелья','Духи'] : [category];
+    let printed=0;
+    cats.forEach(function(cat){
+      const rows=all.filter(function(e){ return e.cat===cat; }).sort(rowSort);
+      if(!rows.length) return;
+      printed+=rows.length;
+      if(mode==='all'){
+        const c=document.createElement('h4');
+        c.className='cathead';
+        c.textContent=cat;
+        list.appendChild(c);
+      }
+      let lastDay='';
+      let group=null;
+      rows.forEach(function(e){
+        if(e.date!==lastDay){
+          lastDay=e.date;
+          group=document.createElement('div');
+          group.className='daygroup';
+          const h=document.createElement('h4');
+          h.textContent=fmtDay(e.date);
+          group.appendChild(h);
+          list.appendChild(group);
+        }
+        const art=document.createElement('article');
+        art.className='entry';
+        const del=document.createElement('button');
+        del.className='del'; del.type='button'; del.title='Удалить запись'; del.textContent='×';
+        del.addEventListener('click',function(){
+          if(!window.confirm('Удалить эту запись?')) return;
+          write(read().filter(function(x){ return x.id!==e.id; }));
+          render();
+        });
+        const h5=document.createElement('h5');
+        h5.textContent=e.cat;
+        const meta=document.createElement('div');
+        meta.className='meta';
+        meta.textContent='Луна: '+moonNameAt(e.date)+(e.astro?' · '+e.astro:'');
+        const pEl=document.createElement('p');
+        pEl.textContent=e.text;
+        art.append(del,h5,meta,pEl);
+        group.appendChild(art);
+      });
+    });
+    if(!printed){
+      const d=document.createElement('div');
+      d.className='empty'; d.textContent='Записей пока нет.';
+      list.appendChild(d);
+    }
+  }
+  document.querySelectorAll('#noteTabs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      category=b.dataset.cat;
+      document.querySelectorAll('#noteTabs button').forEach(function(x){ x.classList.toggle('active',x===b); });
+      document.getElementById('noteCat').textContent=category;
+      render();
+    });
+  });
+  const dateEl=document.getElementById('noteDate');
+  dateEl.value=new Date().toISOString().slice(0,10);
+  document.getElementById('saveNote').addEventListener('click',function(){
+    const text=document.getElementById('noteText').value.trim();
+    if(!text){ document.getElementById('noteText').focus(); return; }
+    const date=dateEl.value || new Date().toISOString().slice(0,10);
+    const rows=read();
+    rows.push({
+      id:Date.now()+'-'+Math.random().toString(36).slice(2,7),
+      date:date, cat:category,
+      astro:document.getElementById('noteEvent').value.trim(),
+      text:text, created:Date.now()
+    });
+    if(!write(rows)){
+      window.alert('Не удалось сохранить: на устройстве закончилось место.');
+      return;
+    }
+    document.getElementById('noteText').value='';
+    document.getElementById('noteEvent').value='';
+    render();
+  });
+  document.getElementById('clearAll').addEventListener('click',function(){
+    if(!window.confirm('Стереть все записи всех трёх страниц? Это необратимо.')) return;
+    write([]); render();
+  });
+  document.getElementById('exportPdf').addEventListener('click',function(){
+    render('all');
+    if(window.Koleso && window.Koleso.printPage){ window.Koleso.printPage(); }
+    else { setTimeout(function(){ window.print(); },80); }
+  });
+  window.addEventListener('beforeprint',function(){ render('all'); });
+  window.addEventListener('afterprint',function(){ render(); });
+  window.addEventListener('woy-theme',paintArt);
+  window.addEventListener('storage',function(e){ if(e.key===KEY) render(); });
+  render();
+})();
 </script>
 </body>
 </html>

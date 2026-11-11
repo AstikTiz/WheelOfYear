@@ -6,6 +6,7 @@ on:
     paths:
       - 'index.html'
       - 'bg.png'
+      - 'images/**'
       - 'android/**'
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
@@ -24,6 +25,7 @@ jobs:
           rm -rf android/app/src/main/assets/www
           mkdir -p android/app/src/main/assets/www
           cp index.html bg.png android/app/src/main/assets/www/
+          if [ -d images ]; then mkdir -p android/app/src/main/assets/www/images && cp images/* android/app/src/main/assets/www/images/; fi
 
       - uses: actions/setup-java@v4
         with:

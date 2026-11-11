@@ -1,17 +1,33 @@
 package ai.ilands.koleso;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.view.KeyEvent;
+import android.widget.Toast;
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Base64;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ctx = this;
         web = new WebView(this);
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -22,8 +38,71 @@ public class MainActivity extends Activity {
         s.setAllowUniversalAccessFromFileURLs(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         web.setBackgroundColor(0xFF15110D);
+        web.addJavascriptInterface(new Bridge(), "Koleso");
         setContentView(web);
         web.loadUrl("file:///android_asset/www/index.html");
+    }
+
+    public class Bridge {
+        /** Сохраняет рисунок руны в Pictures/Koleso. */
+        @JavascriptInterface
+        public void savePng(final String name, final String base64) {
+            try {
+                byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.Images.Media.DISPLAY_NAME, name);
+                    cv.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                    cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Koleso");
+                    Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+                    if (uri == null) throw new Exception("media store");
+                    java.io.OutputStream os = getContentResolver().openOutputStream(uri);
+                    os.write(bytes);
+                    os.close();
+                } else {
+                    File dir = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES), "Koleso");
+                    if (!dir.exists()) dir.mkdirs();
+                    File out = new File(dir, name);
+                    FileOutputStream fos = new FileOutputStream(out);
+                    fos.write(bytes);
+                    fos.close();
+                }
+                toast("Сохранено в галерею: Pictures/Koleso/" + name);
+            } catch (Exception e) {
+                toast("Не удалось сохранить рисунок");
+            }
+        }
+
+        /** Системное окно печати: оттуда «Сохранить как PDF». */
+        @JavascriptInterface
+        public void printPage() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                    String job = "koleso-grimoire";
+                    PrintDocumentAdapter adapter;
+                    if (android.os.Build.VERSION.SDK_INT >= 21) {
+                        adapter = web.createPrintDocumentAdapter(job);
+                    } else {
+                        adapter = web.createPrintDocumentAdapter();
+                    }
+                    PrintAttributes attrs = new PrintAttributes.Builder()
+                            .setMediaSize(PrintAttributes.MediaSize.ISO_A5)
+                            .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                            .build();
+                    pm.print(job, adapter, attrs);
+                }
+            });
+        }
+    }
+
+    private void toast(final String text) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(ctx, text, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
