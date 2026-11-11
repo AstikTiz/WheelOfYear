@@ -6,7 +6,11 @@ import android.os.Environment;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -39,6 +43,39 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         web.setBackgroundColor(0xFF15110D);
         web.addJavascriptInterface(new Bridge(), "Koleso");
+        /* без этого window.confirm() в WebView молча возвращает false: удаление записей не срабатывало */
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage(message)
+                        .setPositiveButton("Хорошо", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int w) { result.confirm(); }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface d) { result.cancel(); }
+                        })
+                        .show();
+                return true;
+            }
+
+            @Override
+            public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage(message)
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int w) { result.confirm(); }
+                        })
+                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int w) { result.cancel(); }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface d) { result.cancel(); }
+                        })
+                        .show();
+                return true;
+            }
+        });
         setContentView(web);
         web.loadUrl("file:///android_asset/www/index.html");
     }
@@ -47,12 +84,19 @@ public class MainActivity extends Activity {
         /** Сохраняет рисунок руны в Pictures/Koleso. */
         @JavascriptInterface
         public void savePng(final String name, final String base64) {
+            saveImage(name, base64, "image/png");
+        }
+
+        /** Сохраняет PNG или JPG в Pictures/Koleso (галерея). */
+        @JavascriptInterface
+        public void saveImage(final String name, final String base64, final String mime) {
+            final String type = (mime == null || mime.isEmpty()) ? "image/png" : mime;
             try {
                 byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
                 if (Build.VERSION.SDK_INT >= 29) {
                     ContentValues cv = new ContentValues();
                     cv.put(MediaStore.Images.Media.DISPLAY_NAME, name);
-                    cv.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                    cv.put(MediaStore.Images.Media.MIME_TYPE, type);
                     cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Koleso");
                     Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
                     if (uri == null) throw new Exception("media store");

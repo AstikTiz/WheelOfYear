@@ -404,7 +404,7 @@
       <div class="gmean" id="beastMean">—</div>
       <div class="grow"><span class="gk">Дерево</span><span class="gv" id="treeName">—</span></div>
       <div class="gmean" id="treeMean">—</div>
-      <div class="src">Зверь идёт по живым приметам, без имён и святых: первый снег, первый мёд, отлёт журавлей, тишина кукушки. Примета проверяется глазом, а не книгой. Дерево — огамический календарь, реконструкция Роберта Грейвса, 1948 год.</div>
+      <div class="src">Зверь идёт по живым приметам, без книжных имён: первый снег, первый мёд, отлёт журавлей, тишина кукушки. Примета проверяется глазом, а не книгой. Дерево — огамический календарь, реконструкция Роберта Грейвса, 1948 год.</div>
     </div>
   </section>
 
@@ -480,14 +480,17 @@
       <button class="btn" id="saveNote">Сохранить запись</button>
     </div>
     <div class="notebar">
+      <button class="btn ghost" id="exportPng">Записи в PNG</button>
+      <button class="btn ghost" id="exportJpg">Записи в JPG</button>
       <button class="btn ghost" id="exportPdf">Блокнот в PDF</button>
       <button class="btn ghost" id="clearAll">Стереть всё</button>
     </div>
+    <div class="src" id="exportNote" style="display:none"></div>
     <div class="noteart" id="noteArt">
       <div id="printHead">Странички гримуара</div>
       <div id="noteList"></div>
     </div>
-    <div class="src">Записи живут на этом устройстве, без облака и без аккаунта. Экспорт в PDF: откроется системное окно печати, выбери «Сохранить как PDF».</div>
+    <div class="src">Записи живут на этом устройстве, без облака и без аккаунта. «Записи в PNG/JPG» собирают весь блокнот в одну картинку и кладут её в галерею, в папку Pictures/Koleso. PDF — системное окно печати, там «Сохранить как PDF».</div>
   </section>
 
   <section class="screen">
@@ -1336,7 +1339,11 @@ initPager();
         del.className='del'; del.type='button'; del.title='Удалить запись'; del.textContent='×';
         del.addEventListener('click',function(){
           if(!window.confirm('Удалить эту запись?')) return;
-          write(read().filter(function(x){ return x.id!==e.id; }));
+          const left=read().filter(function(x){ return x.id!==e.id; });
+          if(!write(left)){
+            window.alert('Не удалось сохранить изменение: на устройстве закончилось место.');
+            return;
+          }
           render();
         });
         const h5=document.createElement('h5');
@@ -1389,6 +1396,102 @@ initPager();
     if(!window.confirm('Стереть все записи всех трёх страниц? Это необратимо.')) return;
     write([]); render();
   });
+  function exportNote(msg){
+    const el=document.getElementById('exportNote');
+    if(!el) return;
+    el.textContent=msg||'';
+    el.style.display=msg?'block':'none';
+  }
+  function wrapLines(ctx,txt,maxW){
+    const out=[];
+    String(txt||'').split('\n').forEach(function(par){
+      if(!par.trim()){ out.push(''); return; }
+      let line='';
+      par.trim().split(/\s+/).forEach(function(w){
+        const test=line?line+' '+w:w;
+        if(ctx.measureText(test).width>maxW && line){ out.push(line); line=w; }
+        else line=test;
+      });
+      if(line) out.push(line);
+    });
+    return out.length?out:[''];
+  }
+  /* один лист: считаем высоту всухую, потом рисуем по-настоящему */
+  function drawNotes(ctx,dry){
+    const W=1240, PAD=80, COL=W-2*PAD;
+    let y=PAD+34;
+    function put(txt,font,color,lh,center){
+      ctx.font=font;
+      const lines=wrapLines(ctx,txt,COL);
+      if(!dry){
+        ctx.fillStyle=color;
+        ctx.textAlign=center?'center':'left';
+        lines.forEach(function(l,i){ ctx.fillText(l,center?W/2:PAD,y+i*lh); });
+        ctx.textAlign='left';
+      }
+      y+=lines.length*lh;
+    }
+    if(!dry){
+      ctx.fillStyle='#5a3d1e'; ctx.font='600 28px Georgia, serif'; ctx.textAlign='center';
+      ctx.fillText('СТРАНИЧКИ ГРИМУАРА',W/2,y);
+      ctx.font='15px Arial, sans-serif'; ctx.fillStyle='rgba(90,61,30,.65)';
+      ctx.fillText('Колесо года · '+new Date().toLocaleDateString('ru-RU'),W/2,y+34);
+      ctx.textAlign='left';
+    }
+    y+=76;
+    const all=read();
+    ['Кристаллы','Зелья','Духи'].forEach(function(cat){
+      const rows=all.filter(function(e){ return e.cat===cat; }).sort(rowSort);
+      if(!rows.length) return;
+      put(cat.toUpperCase(),'600 16px Arial, sans-serif','#7a1f1f',24);
+      y+=10;
+      let lastDay='';
+      rows.forEach(function(e){
+        if(e.date!==lastDay){
+          lastDay=e.date;
+          put(fmtDay(e.date),'600 20px Georgia, serif','#3a2a16',28);
+          y+=4;
+        }
+        put('Луна: '+moonNameAt(e.date)+(e.astro?' · '+e.astro:''),'15px Arial, sans-serif','rgba(80,55,25,.72)',21);
+        y+=4;
+        put(e.text,'21px Georgia, "Times New Roman", serif','#2b1d0e',32);
+        if(!dry){
+          ctx.strokeStyle='rgba(168,118,43,.32)';
+          ctx.beginPath(); ctx.moveTo(PAD,y-12); ctx.lineTo(W-PAD,y-12); ctx.stroke();
+        }
+        y+=22;
+      });
+      y+=26;
+    });
+    return y+PAD;
+  }
+  function exportImage(mime){
+    if(!read().length){ exportNote('Записей пока нет — выгружать нечего.'); return; }
+    try{
+      const dry=document.createElement('canvas').getContext('2d');
+      const h=Math.max(620,Math.ceil(drawNotes(dry,true)));
+      const c=document.createElement('canvas');
+      c.width=1240; c.height=h;
+      const x=c.getContext('2d');
+      x.fillStyle='#f6ecd6'; x.fillRect(0,0,c.width,c.height);
+      x.strokeStyle='rgba(168,118,43,.5)'; x.lineWidth=3;
+      x.strokeRect(40,40,c.width-80,c.height-80);
+      drawNotes(x,false);
+      const ext = mime==='image/jpeg'?'jpg':'png';
+      const uri=c.toDataURL(mime,0.92);
+      const name='koleso-zapisi-'+new Date().toISOString().slice(0,10)+'.'+ext;
+      if(window.Koleso && window.Koleso.saveImage){
+        window.Koleso.saveImage(name,uri.split(',')[1],mime);
+      }else{
+        const a=document.createElement('a'); a.download=name; a.href=uri; a.click();
+      }
+      exportNote('Готово: '+name+' — файл в галерее, папка Pictures/Koleso.');
+    }catch(err){
+      exportNote('Не получилось собрать картинку: '+(err&&err.message?err.message:'ошибка'));
+    }
+  }
+  document.getElementById('exportPng').addEventListener('click',function(){ exportImage('image/png'); });
+  document.getElementById('exportJpg').addEventListener('click',function(){ exportImage('image/jpeg'); });
   document.getElementById('exportPdf').addEventListener('click',function(){
     render('all');
     if(window.Koleso && window.Koleso.printPage){ window.Koleso.printPage(); }
