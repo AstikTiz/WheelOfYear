@@ -20,6 +20,7 @@ public class Notify extends BroadcastReceiver {
     static final String PREFS = "koleso";
     static final String KEY_HOUR = "wake_hour";
     static final String KEY_LAST = "last_sent_doy";
+    static final String KEY_SOUTH = "south";
     static final int REQUEST = 1407;
     static final int DEFAULT_HOUR = 9;
 
@@ -35,7 +36,7 @@ public class Notify extends BroadcastReceiver {
         int doy = now.get(Calendar.DAY_OF_YEAR) * 10000 + now.get(Calendar.YEAR) % 100;
         if (p.getInt(KEY_LAST, -1) == doy) return; // уже было сегодня
         p.edit().putInt(KEY_LAST, doy).apply();
-        show(c, KolesoDays.line(now));
+        show(c, KolesoDays.line(now, isSouth(c)));
         schedule(c); // после неточного срабатывания будильник ставим заново на завтра
     }
 
@@ -44,7 +45,7 @@ public class Notify extends BroadcastReceiver {
         if (nm == null) return;
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel ch = new NotificationChannel(CHANNEL, "Колесо года", NotificationManager.IMPORTANCE_DEFAULT);
-            ch.setDescription("Саббат и руна дня");
+            ch.setDescription("Саббат, руна и луна дня");
             nm.createNotificationChannel(ch);
         }
         Intent open = new Intent(c, MainActivity.class);
@@ -54,7 +55,12 @@ public class Notify extends BroadcastReceiver {
 
         Calendar now = Calendar.getInstance();
         int[] nb = KolesoDays.nextSabbat(now);
-        String title = nb[1] == 0 ? "Сегодня " + KolesoDays.S_NAME[nb[0]] : "Колесо года";
+        int mi = KolesoDays.moonIndex(now);
+        boolean phaseDay = mi == 0 || mi == 4 || mi == 2 || mi == 6;
+        String title = nb[1] == 0 ? "Сегодня " + KolesoDays.S_NAME[nb[0]]
+                : phaseDay ? KolesoDays.MOON_NAME[mi].substring(0, 1).toUpperCase()
+                        + KolesoDays.MOON_NAME[mi].substring(1)
+                : "Колесо года";
 
         Notification.Builder b = Build.VERSION.SDK_INT >= 26
                 ? new Notification.Builder(c, CHANNEL)
@@ -67,6 +73,15 @@ public class Notify extends BroadcastReceiver {
          .setAutoCancel(true);
         if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_DEFAULT);
         nm.notify(REQUEST, b.build());
+    }
+
+    static boolean isSouth(Context c) {
+        return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SOUTH, false);
+    }
+
+    static void setSouth(Context c, boolean south) {
+        c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_SOUTH, south).apply();
+        schedule(c);
     }
 
     static int wakeHour(Context c) {

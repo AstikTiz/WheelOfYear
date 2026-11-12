@@ -219,6 +219,9 @@
   .moonrows{display:flex;justify-content:center;gap:18px;margin-top:12px}
   .moonrows div{font-size:13px;color:#3a2a16}
   .moonrows b{display:block;font-size:15px;color:var(--red);letter-spacing:.03em}
+  .tabs2{display:flex;gap:8px;justify-content:center;margin:12px 0 4px}
+  .tabs2 button{font:inherit;font-size:13px;padding:6px 14px;border-radius:14px;border:1px solid rgba(120,90,60,.35);background:transparent;color:inherit;cursor:pointer}
+  .tabs2 button.active{background:rgba(120,90,60,.18);border-color:rgba(120,90,60,.6)}
   .moontip{margin-top:12px;font-size:13.5px;line-height:1.5;color:#3a2a16;font-style:italic}
 
   /* ================= тема, зелень, гримуар ================= */
@@ -378,6 +381,9 @@
     <div class="notifrow" id="notifRow" style="display:none">
       <button class="notifbtn" id="notifBtn">Уведомление в <b id="notifHour">9:00</b> · нажать, чтобы поменять</button>
     </div>
+    <div class="notifrow" id="hemiRow" style="display:none">
+      <button class="notifbtn" id="hemiBtn">Полушарие: <b id="hemiVal">северное</b> · нажать, чтобы поменять</button>
+    </div>
     <div class="airspace"></div>
     <div class="vines" aria-hidden="true"></div>
     <div class="airspace"></div>
@@ -449,6 +455,12 @@
         <div><b id="moonNext">—</b>до смены</div>
       </div>
       <div class="moontip" id="moonTip">—</div>
+      <div class="moontip" id="moonCircle">—</div>
+      <div class="tabs2" id="ritualTabs">
+        <button data-t="morning" class="active">Утро</button>
+        <button data-t="evening">Вечер</button>
+      </div>
+      <div class="moontip" id="ritualText">—</div>
     </div>
     <div class="src">Считано по синодическому месяцу (29,53 дня) от новолуния 6 января 2000 года. Точность около суток, у границы фазы может разойтись с таблицей. Если нужен день в день — сверьтесь с лунным календарём (starwalk.space/ru/moon-calendar).</div>
   </section>
@@ -495,7 +507,10 @@
       <button class="btn ghost" id="exportPng">Записи в PNG</button>
       <button class="btn ghost" id="exportJpg">Записи в JPG</button>
       <button class="btn ghost" id="exportPdf">Блокнот в PDF</button>
+      <button class="btn ghost" id="backupSave">Копия в файл</button>
+      <button class="btn ghost" id="backupLoad">Загрузить копию</button>
       <button class="btn ghost" id="clearAll">Стереть всё</button>
+      <input type="file" id="backupFile" accept=".json,application/json" style="display:none">
     </div>
     <div class="src" id="exportNote" style="display:none"></div>
     <div class="noteart" id="noteArt">
@@ -570,6 +585,12 @@ function ymd(d){const y=d.getFullYear();
 
 function dayOfYear(y,m,d){return Math.round((Date.UTC(y,m-1,d)-Date.UTC(y,0,1))/86400000)+1;}
 
+const MIRROR_SEASON = {зима:"лето", весна:"осень", лето:"зима", осень:"весна"};
+function hemisphere(){
+  try { return localStorage.getItem('woy-hem')==='south' ? 'south' : 'north'; }
+  catch(e){ return 'north'; }
+}
+
 function build(){
   const now = new Date();
   const y = now.getFullYear();
@@ -578,8 +599,16 @@ function build(){
   // year length
   const yearLen = Math.round((Date.UTC(y+1,0,1) - Date.UTC(y,0,1)) / 86400000);
 
-  const items = SABBATS.map(s=>({...s, doy: dayOfYear(y,s.m,s.d)}))
-                       .sort((a,b)=>a.doy-b.doy);
+  let items = SABBATS.map(s=>({...s, doy: dayOfYear(y,s.m,s.d)}))
+                     .sort((a,b)=>a.doy-b.doy);
+  /* южное полушарие: колесо сдвинуто на полгода, сезоны зеркалятся */
+  if(hemisphere()==='south'){
+    items = items.map(s=>{
+      let d = s.doy + 182;
+      if(d > yearLen) d -= yearLen;
+      return {...s, doy: d, season: MIRROR_SEASON[s.season]};
+    }).sort((a,b)=>a.doy-b.doy);
+  }
 
   document.getElementById('today').textContent =
     now.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
@@ -598,7 +627,8 @@ function build(){
 
   document.getElementById('nextName').textContent = next.name;
   document.getElementById('nextDate').textContent =
-    new Date(Date.UTC(nextYear, next.m-1, next.d)).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+    new Date(Date.UTC(y,0,1) + (next.doy-1)*86400000)
+      .toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
   document.getElementById('days').textContent = daysLeft;
   document.getElementById('progress').style.width = Math.round(frac*100)+'%';
 
@@ -1115,6 +1145,35 @@ const MOON_NOTE=[
  "остановка: подведи счёт, не подписывай нового",
  "убирай: долги, сор, лишние слова"];
 
+/* Круг луны: восемь текстов на восемь фаз, порядок совпадает с MOON_NAME */
+const MOON_CIRCLE=[
+ "Небо укрыло Луну. В этой тишине можно услышать семя нового намерения.",
+ "Серебряный серп набирает силу. Пусть и твой замысел тянется к свету.",
+ "На пути возник порог. Какой шаг поможет его переступить?",
+ "Свет прибывает — укрепи то, что хочешь сохранить и взрастить.",
+ "Луна открыла свой полный лик. Время для обряда, созерцания или благодарности.",
+ "Свет убывает, унося лишнее. Что можно отпустить вместе с ним?",
+ "Старые узлы ослабевают. Развяжи один из них — внутри или снаружи.",
+ "За завесой темноты зреет покой. Не всякая тайна требует ответа сегодня."
+];
+/* Ритуалы: один на день, по счёту дня в году. Утро и вечер меняются кнопкой. */
+const RITUAL_MORNING=[
+ ["Пробуждение","День ещё не раскрыл своих тайн. Сделай три спокойных вдоха и выбери слово, которое станет твоим оберегом на сегодня."],
+ ["Солнечный привет","Прикоснись к свету — у окна или в мыслях. Что ты хочешь призвать в этот день?"],
+ ["Капля намерения","Налей воды и подержи чашу в ладонях. Назови про себя одно намерение — и сделай первый глоток."],
+ ["Корни и крылья","Почувствуй опору под ногами. Представь, как корни удерживают тебя, а дыхание открывает путь вперёд."],
+ ["Знак дня","Выбери символ, камень или цвет, который будет напоминать о твоём намерении."],
+ ["Тихая благодарность","Прежде чем день заговорит громко, вспомни одну вещь, за которую благодарно сердце."]
+];
+const RITUAL_EVENING=[
+ ["Снятие дня","День закрывает свои врата. Сделай медленный выдох и мысленно оставь за порогом то, что больше не нужно нести."],
+ ["Три искры","Вспомни три мгновения — большие или совсем малые — которые сегодня согрели тебя."],
+ ["Запись в гримуар","Запиши одно чувство, одну мысль и одну загадку, оставшуюся от этого дня."],
+ ["Очищение водой","Умойся или вымой руки, представляя, как вода уносит дневной шум."],
+ ["Лунная пауза","Посмотри на небо, если оно открыто. Если нет — найди тишину внутри и прислушайся к ней."],
+ ["Сонное заклинание","Положи ладонь на сердце. Назови то, что можно отпустить до утра, и позволь ночи укрыть остальное."]
+];
+
 const OGHAM=[
  {og:'ᚁ',n:'Берёза',lat:'beith',m1:'24.12',m2:'20.01',mean:'чистый лист: новое, дом, защита того, что только началось'},
  {og:'ᚂ',n:'Рябина',lat:'luis',m1:'21.01',m2:'17.02',mean:'зоркость и оберег: свой глаз зорче чужого'},
@@ -1167,6 +1226,21 @@ function drawMoon(){
   document.getElementById('moonLight').textContent=light+'%';
   document.getElementById('moonNext').textContent=d+' '+plural(d);
   document.getElementById('moonTip').textContent=MOON_NOTE[idx];
+  const mc=document.getElementById('moonCircle');
+  if(mc) mc.textContent=MOON_CIRCLE[idx];
+  drawRitual();
+}
+
+/* утро/вечер: текст выбирается по дню в году, не случайно */
+let ritualMode='morning';
+function drawRitual(){
+  const box=document.getElementById('ritualText');
+  if(!box) return;
+  const d=new Date();
+  const doy=dayOfYear(d.getFullYear(), d.getMonth()+1, d.getDate());
+  const list=ritualMode==='evening'?RITUAL_EVENING:RITUAL_MORNING;
+  const r=list[doy%list.length];
+  box.innerHTML='<b>'+r[0]+'.</b> '+r[1];
 }
 
 /* ---------- листание ---------- */
@@ -1543,6 +1617,124 @@ initPager();
     btn.innerHTML='Уведомление в <b id="notifHour">'+cur+':00</b> · нажать, чтобы поменять';
     lab=document.getElementById('notifHour');
     if(taps===2 && window.Koleso.testNotification){ window.Koleso.testNotification(); }
+  });
+})();
+
+/* ---------- резервная копия: файл, который переживает смену телефона ---------- */
+(function(){
+  var KEYN='woy-grimoire';
+  function payload(){
+    var notes=[]; try{ notes=JSON.parse(localStorage.getItem(KEYN)||'[]'); }catch(e){}
+    var theme=null, hem='north';
+    try{ theme=localStorage.getItem('woy-theme'); hem=localStorage.getItem('woy-hem')||'north'; }catch(e){}
+    return {
+      app:'koleso-goda', v:1, at:new Date().toISOString(),
+      theme:theme, hemisphere:hem,
+      wakeHour:(window.Koleso&&window.Koleso.wakeHour)?window.Koleso.wakeHour():null,
+      notes:Array.isArray(notes)?notes:[]
+    };
+  }
+  function note(msg){
+    var el=document.getElementById('exportNote');
+    if(el){ el.style.display='block'; el.textContent=msg; }
+  }
+  function apply(data){
+    if(!data || data.app!=='koleso-goda' || !Array.isArray(data.notes)){
+      note('Это не файл копии Колеса года. Взял первый файл? Нужен koleso-backup-*.json');
+      return;
+    }
+    var cur=[]; try{ cur=JSON.parse(localStorage.getItem(KEYN)||'[]'); }catch(e){}
+    var seen={}; cur.forEach(function(n,k){ seen[(n.date||'')+'|'+(n.text||'')]=k; });
+    var added=0;
+    data.notes.forEach(function(n){
+      var k=(n.date||'')+'|'+(n.text||'');
+      if(seen[k]!==undefined) return;
+      if(!n.id) n.id=Date.now()+'-'+Math.random().toString(36).slice(2,7);
+      cur.push(n); seen[k]=cur.length-1; added++;
+    });
+    try{
+      localStorage.setItem(KEYN, JSON.stringify(cur));
+      if(data.theme) localStorage.setItem('woy-theme', data.theme);
+      if(data.hemisphere) localStorage.setItem('woy-hem', data.hemisphere==='south'?'south':'north');
+    }catch(e){ note('Не удалось записать: на устройстве нет места.'); return; }
+    if(window.Koleso && window.Koleso.setWakeHour && typeof data.wakeHour==='number'){
+      window.Koleso.setWakeHour(data.wakeHour);
+    }
+    note('Копия прочитана: добавлено записей '+added+', всего '+cur.length+'. Настройки вернулись.');
+    build(); drawMoon(); drawStar();
+    window.dispatchEvent(new Event('storage'));
+    setTimeout(function(){ location.reload(); },900);
+  }
+  window.kolesoLoadBackup=function(b64){
+    try{ apply(JSON.parse(decodeURIComponent(escape(atob(b64))))); }
+    catch(e){ note('Копия не прочиталась: файл повреждён.'); }
+  };
+  document.getElementById('backupSave').addEventListener('click',function(){
+    var data=payload();
+    var name='koleso-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    var txt=JSON.stringify(data,null,1);
+    if(window.Koleso && window.Koleso.saveBackup){
+      window.Koleso.saveBackup(name, txt);
+      note('Копия сохранена в Загрузки/Koleso/'+name+' — '+(data.notes.length)+' записей.');
+      return;
+    }
+    try{
+      var blob=new Blob([txt],{type:'application/json'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },3000);
+      note('Копия скачана: '+name+' — '+data.notes.length+' записей.');
+    }catch(e){
+      note('Браузер не дал сохранить файл. Откройте страницу в APK — там копия пишется в Загрузки.');
+    }
+  });
+  document.getElementById('backupLoad').addEventListener('click',function(){
+    if(window.Koleso && window.Koleso.pickBackup){ window.Koleso.pickBackup(); return; }
+    document.getElementById('backupFile').click();
+  });
+  document.getElementById('backupFile').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0];
+    if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){ try{ apply(JSON.parse(fr.result)); }catch(err){ note('Копия не прочиталась: файл повреждён.'); } };
+    fr.readAsText(f);
+  });
+})();
+
+/* ---------- полушарие (работает и на странице, и в APK) ---------- */
+(function(){
+  var row=document.getElementById('hemiRow');
+  var btn=document.getElementById('hemiBtn');
+  var val=document.getElementById('hemiVal');
+  if(!row||!btn) return;
+  row.style.display='flex';
+  function paint(){
+    var h = hemisphere();
+    val.textContent = h==='south' ? 'южное' : 'северное';
+    if(window.Koleso && window.Koleso.setHemisphere) window.Koleso.setHemisphere(h);
+  }
+  paint();
+  btn.addEventListener('click',function(){
+    var next = hemisphere()==='south' ? 'north' : 'south';
+    try{ localStorage.setItem('woy-hem', next); }catch(e){}
+    paint();
+    build();
+    drawMoon();
+    drawStar();
+  });
+})();
+
+/* ---------- утро/вечер на экране луны ---------- */
+(function(){
+  var tabs=document.getElementById('ritualTabs');
+  if(!tabs) return;
+  tabs.addEventListener('click',function(e){
+    var b=e.target.closest('button');
+    if(!b) return;
+    ritualMode=b.dataset.t;
+    [].forEach.call(tabs.children,function(x){ x.className = x===b?'active':''; });
+    drawRitual();
   });
 })();
 </script>

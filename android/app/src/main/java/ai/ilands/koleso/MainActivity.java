@@ -24,10 +24,15 @@ import android.content.pm.PackageManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import android.content.Intent;
+import android.net.Uri;
 
 public class MainActivity extends Activity {
     private WebView web;
     private Context ctx;
+    static final int REQ_BACKUP = 1408;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +162,54 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** Полушарие: южное сдвигает колесо на полгода и в уведомлении тоже. */
+        @JavascriptInterface
+        public void setHemisphere(String hemi) {
+            Notify.setSouth(ctx, "south".equals(hemi));
+        }
+
+        /** Резервная копия: пишем текстовый файл в Загрузки/Koleso. */
+        @JavascriptInterface
+        public void saveBackup(final String name, final String text) {
+            try {
+                byte[] bytes = text.getBytes("UTF-8");
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.Downloads.DISPLAY_NAME, name);
+                    cv.put(MediaStore.Downloads.MIME_TYPE, "application/json");
+                    cv.put(MediaStore.Downloads.RELATIVE_PATH, "Download/Koleso");
+                    Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv);
+                    if (uri == null) throw new Exception("media store");
+                    java.io.OutputStream os = getContentResolver().openOutputStream(uri);
+                    os.write(bytes);
+                    os.close();
+                } else {
+                    File dir = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS), "Koleso");
+                    if (!dir.exists()) dir.mkdirs();
+                    FileOutputStream fos = new FileOutputStream(new File(dir, name));
+                    fos.write(bytes);
+                    fos.close();
+                }
+                toast("Копия сохранена: Загрузки/Koleso/" + name);
+            } catch (Exception e) {
+                toast("Не удалось сохранить копию");
+            }
+        }
+
+        /** Выбрать файл копии: результат уходит в window.kolesoLoadBackup(base64). */
+        @JavascriptInterface
+        public void pickBackup() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("*/*");
+                    startActivityForResult(i, REQ_BACKUP);
+                }
+            });
+        }
+
         /** Системное окно печати: оттуда «Сохранить как PDF». */
         @JavascriptInterface
         public void printPage() {
@@ -186,6 +239,24 @@ public class MainActivity extends Activity {
                 Toast.makeText(ctx, text, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req != REQ_BACKUP || res != RESULT_OK || data == null || data.getData() == null) return;
+        try {
+            InputStream in = getContentResolver().openInputStream(data.getData());
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+            in.close();
+            String b64 = Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP);
+            if (web != null) web.evaluateJavascript("window.kolesoLoadBackup('" + b64 + "')", null);
+        } catch (Exception e) {
+            toast("Не удалось прочитать файл копии");
+        }
     }
 
     @Override
