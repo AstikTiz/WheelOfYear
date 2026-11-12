@@ -20,6 +20,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.content.pm.PackageManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -76,11 +77,49 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        /* уведомление раз в день: канал + разрешение + будильник */
+        Notify.schedule(this);
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 33);
+        }
         setContentView(web);
         web.loadUrl("file:///android_asset/www/index.html");
     }
 
     public class Bridge {
+        /** Час, в который приходит уведомление (по умолчанию 9). */
+        @JavascriptInterface
+        public int wakeHour() {
+            return Notify.wakeHour(ctx);
+        }
+
+        /** Поставить другой час, 0–23. */
+        @JavascriptInterface
+        public void setWakeHour(int hour) {
+            Notify.setWakeHour(ctx, hour);
+        }
+
+        /** Спросить разрешение на уведомления (Android 13+). */
+        @JavascriptInterface
+        public void askNotifications() {
+            if (Build.VERSION.SDK_INT >= 33
+                    && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 33);
+                    }
+                });
+            }
+        }
+
+        /** Проверить прямо сейчас, что уведомление выглядит как надо. */
+        @JavascriptInterface
+        public void testNotification() {
+            askNotifications();
+            Notify.show(ctx, KolesoDays.line(java.util.Calendar.getInstance()));
+        }
+
         /** Сохраняет рисунок руны в Pictures/Koleso. */
         @JavascriptInterface
         public void savePng(final String name, final String base64) {
