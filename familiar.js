@@ -25,11 +25,9 @@
     adult:    'images/familiar-SEASON.png',
     // Кадры вылупления, по порядку. Если кадров нет — оставь пустым [],
     // будет просто покачивание яйца.
-    hatch: [
-      'images/familiar-egg-crack1.png',
-      'images/familiar-egg-crack2.png',
-      'images/familiar-hatch.png'
-    ],
+    hatch: [],
+    hatchVideo: 'images/familiar-hatch.webm',
+    giftBag:    'images/gift-bag.png',
     w: 84   // ширина зверька на экране, px
   };
 
@@ -171,6 +169,8 @@
       '#fam{position:fixed;right:14px;bottom:64px;z-index:60;width:' + SPRITES.w + 'px;',
       '  user-select:none;-webkit-user-select:none;touch-action:manipulation}',
       '#fam img{display:block;width:100%;height:auto;cursor:pointer;',
+      '#fam video{display:block;width:100%;height:auto;pointer-events:none;',
+      '  filter:drop-shadow(0 6px 8px rgba(0,0,0,.45))}',
       '  filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));transform-origin:50% 90%}',
       '#fam.walk img{animation:fam-bob 2.2s ease-in-out infinite}',
       '#fam.wobble img{animation:fam-wobble .45s ease}',
@@ -272,31 +272,53 @@
   }
 
   function hatch() {
+    var host = document.getElementById('fam');
     var img = document.getElementById('fam-img');
     ui.classList.add('hatch');
+
+    function done() {
+      ui.classList.remove('hatch');
+      var v = document.getElementById('fam-vid');
+      if (v && v.parentNode) v.parentNode.removeChild(v);
+      if (img) { img.style.display = ''; }
+      state.stage = 'young';
+      state.born = todayKey();
+      if (img) img.src = spriteUrl();
+      say('Привет! Я теперь живу тут. Заглядывай почаще — я от этого расту.', true);
+      save();
+    }
+
+    if (SPRITES.hatchVideo && host) {
+      var v = document.createElement('video');
+      v.id = 'fam-vid';
+      v.src = SPRITES.hatchVideo;
+      v.muted = true;
+      v.autoplay = true;
+      v.playsInline = true;
+      v.setAttribute('muted', '');
+      v.setAttribute('playsinline', '');
+      v.setAttribute('webkit-playsinline', '');
+      if (img) img.style.display = 'none';
+      host.appendChild(v);
+      var finished = false;
+      function once() { if (finished) return; finished = true; done(); }
+      v.addEventListener('ended', once);
+      v.addEventListener('error', once);
+      setTimeout(once, 7000);
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+      return;
+    }
+
     var frames = SPRITES.hatch;
     if (frames && frames.length) {
       var i = 0;
       var iv = setInterval(function () {
         if (i < frames.length) { img.src = frames[i++]; }
-        else {
-          clearInterval(iv);
-          ui.classList.remove('hatch');
-          state.stage = 'young';
-          state.born = todayKey();
-          img.src = spriteUrl();
-          say('Привет! Я теперь живу тут. Заглядывай почаще — я от этого расту.', true);
-          save();
-        }
+        else { clearInterval(iv); done(); }
       }, 420);
-    } else {
-      ui.classList.remove('hatch');
-      state.stage = 'young';
-      state.born = todayKey();
-      img.src = spriteUrl();
-      save();
-    }
+    } else { done(); }
   }
+
 
   /* ---------- запуск ---------- */
 
