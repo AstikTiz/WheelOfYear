@@ -153,7 +153,7 @@ final class KolesoDays {
             cand[i] = d;
             shifted[i] = d;
             if (south) {
-                shifted[i] = d + 182;
+                shifted[i] = d + yl / 2;
                 if (shifted[i] > yl) shifted[i] -= yl;
             }
         }

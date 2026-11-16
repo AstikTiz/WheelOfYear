@@ -246,12 +246,12 @@ public class MainActivity extends Activity {
         super.onActivityResult(req, res, data);
         if (req != REQ_BACKUP || res != RESULT_OK || data == null || data.getData() == null) return;
         try {
-            InputStream in = getContentResolver().openInputStream(data.getData());
             ByteArrayOutputStream bo = new ByteArrayOutputStream();
             byte[] buf = new byte[8192];
             int n;
-            while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
-            in.close();
+            try (InputStream in = getContentResolver().openInputStream(data.getData())) {
+                while ((n = in.read(buf)) != -1) bo.write(buf, 0, n);
+            }
             String b64 = Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP);
             if (web != null) web.evaluateJavascript("window.kolesoLoadBackup('" + b64 + "')", null);
         } catch (Exception e) {

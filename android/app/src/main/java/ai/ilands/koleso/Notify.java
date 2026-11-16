@@ -65,7 +65,7 @@ public class Notify extends BroadcastReceiver {
         Notification.Builder b = Build.VERSION.SDK_INT >= 26
                 ? new Notification.Builder(c, CHANNEL)
                 : new Notification.Builder(c);
-        b.setSmallIcon(R.drawable.icon)
+        b.setSmallIcon(R.drawable.ic_notify)
          .setContentTitle(title)
          .setContentText(text.split("\n")[0])
          .setStyle(new Notification.BigTextStyle().bigText(text))
