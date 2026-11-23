@@ -22,9 +22,11 @@
   // Поменяй при желании — код один на всех, отличаются только спрайт и пара фраз.
   var FAMILIARS = {
     rabbit: { title: 'кролик',  epithet: 'Листвень', sabbats: [0, 1], sprite: 'images/familiar-rabbit.png',
+      preview: 'images/familiar-listven-preview.webp',
       own: ['Я сегодня перепрыгнул три пня подряд. Три! Не веришь — проверь мох.',
             'Ушами я слышу, как растёт трава. Хрусть-хрусть. Нетерпеливо.'] },
     cat:    { title: 'кот',     epithet: 'Вечерник', sabbats: [2],    sprite: 'images/familiar-cat.png',
+      preview: 'images/familiar-portrait.jpg',
       own: ['Я крался за зайцем. Зачем — не спрашивай. Коты так не объясняют.',
             'Ночью я ходил по краю мира. Край оказался мягким, как мох.'] },
     snake:  { title: 'змея',    epithet: 'Гладкая',  sabbats: [3],    sprite: 'images/familiar-snake.png',
@@ -34,6 +36,7 @@
       own: ['Мой мох сегодня гуще вчерашнего. Это хороший знак для твоих замыслов.',
             'Я стоял неподвижно семь дней. Мимо прошли олень, две сныти и твоя мысль.'] },
     raven:  { title: 'ворон',   epithet: 'Железнокрыл', sabbats: [5],  sprite: 'images/familiar-raven.png',
+      preview: 'images/raven/raven-portrait.jpg',
       own: ['Я помню место, где лежит блестящее. Все вороны помнят. Это наше дело.',
             'С высоты дуба твой год выглядит почти круглым. Почти.'] },
     owl:    { title: 'сова',    epithet: 'Полуночница', sabbats: [6], sprite: 'images/familiar-owl.png',
@@ -232,11 +235,12 @@
   /* ---------- выбор фразы ---------- */
 
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
-  function fill(t) {
+  function fill(t, type) {
+    var f = FAMILIARS[type || state.chosen || (state.offered && state.offered.t)] || {};
     return t.replace('{name}', state.name || '')
-            .replace('{title}', fam().title)
-            .replace('{epithet}', fam().epithet)
-            .replace('{sabbats}', fam().sabbats.map(function (i) { return S_NAMES[i]; }).join(' и '))
+            .replace('{title}', f.title || '')
+            .replace('{epithet}', f.epithet || '')
+            .replace('{sabbats}', (f.sabbats || []).map(function (i) { return S_NAMES[i]; }).join(' и '))
             .replace('{moon}', moonName())
             .replace('{meet}', pick(PH.MEET));
   }
@@ -285,6 +289,21 @@
       '#fam-choice button{font:inherit;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer;',
       '  border:1px solid rgba(168,118,43,.5);background:transparent;color:inherit}',
       '#fam-choice button:first-child{background:var(--red,#7b2c1d);color:#fdf3dd;border-color:transparent}',
+      '#fam-pick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;',
+      '  background:rgba(8,12,9,.66);padding:16px}',
+      '#fam-pick.on{display:flex}',
+      '#fam-pick .card{width:min(92vw,340px);max-height:90vh;overflow:auto;border-radius:14px;',
+      '  background:var(--paper,#fdf3dd);border:1px solid rgba(168,118,43,.5);',
+      '  box-shadow:0 18px 48px rgba(0,0,0,.55)}',
+      '#fam-pick .pic{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:13px 13px 0 0}',
+      '#fam-pick .txt{padding:12px 14px 14px;font-size:13.5px;line-height:1.5;color:var(--ink,#33241a)}',
+      '#fam-pick .who{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ochre,#a8762b);margin-bottom:6px}',
+      '#fam-pick .row{display:flex;gap:8px;margin-top:12px}',
+      '#fam-pick button{flex:1;font:inherit;font-size:13px;padding:9px 12px;border-radius:999px;cursor:pointer;',
+      '  border:1px solid rgba(168,118,43,.5);background:transparent;color:inherit}',
+      '#fam-pick button:first-child{background:var(--red,#7b2c1d);color:#fdf3dd;border-color:transparent}',
+      ':root[data-theme="dark"] #fam-pick .card{background:#1c2820;border-color:rgba(180,205,170,.3)}',
+      ':root[data-theme="dark"] #fam-pick .txt{color:#e6ddcd}',
       '@keyframes fam-bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-7px) rotate(1.5deg)}}',
       '@keyframes fam-wobble{0%{transform:rotate(0)}25%{transform:rotate(-9deg)}75%{transform:rotate(7deg)}100%{transform:rotate(0)}}'
     ].join('\n');
@@ -310,6 +329,31 @@
     }
   }
   function hideBubble() { document.getElementById('fam-bubble').classList.remove('on'); }
+
+  /* ---------- карточка выбора фамиляра ---------- */
+
+  function hidePickCard() {
+    var el = document.getElementById('fam-pick');
+    if (el) { el.classList.remove('on'); el.innerHTML = ''; }
+  }
+
+  // Возвращает true, если карточка показана (тогда бабл с кнопками не нужен).
+  function showPickCard(type) {
+    var f = FAMILIARS[type];
+    if (!f || !f.preview) return false;
+    var el = document.getElementById('fam-pick');
+    if (!el) { el = document.createElement('div'); el.id = 'fam-pick'; document.body.appendChild(el); }
+    el.innerHTML = '<div class="card">' +
+        '<img class="pic" alt="' + f.title + ' ' + f.epithet + '" src="' + f.preview + '">' +
+        '<div class="txt"><div class="who">' + f.title + ' · ' + f.epithet + '</div>' +
+        fill(pick(PH.offer), type) +
+        '<div class="row"><button data-yes>Приму</button><button data-no>Иди с миром</button></div>' +
+      '</div></div>';
+    el.querySelector('[data-yes]').onclick = function () { hidePickCard(); accept(); };
+    el.querySelector('[data-no]').onclick = function () { hidePickCard(); decline(); };
+    el.classList.add('on');
+    return true;
+  }
 
   function setNameLabel() {
     document.getElementById('fam-name').textContent =
@@ -358,7 +402,8 @@
     document.getElementById('fam-img').src = FAMILIARS[type].sprite;
     setNameLabel();
     show();
-    say(fill(pick(PH.offer)) +
+    if (showPickCard(type)) return;
+    say(fill(pick(PH.offer), type) +
       '<div id="fam-choice"><button data-yes>Приму</button><button data-no>Иди с миром</button></div>',
       false, true);
   }
@@ -371,7 +416,7 @@
     state.visits = 1;
     state.offered = null;
     setNameLabel();
-    say(fill(pick(PH.accepted)) + '<br><br>И это тебе, с праздника: <b>' + giveGift(nextSabbat()[0]) + '</b>.', true);
+    say(fill(pick(PH.accepted), state.chosen) + '<br><br>И это тебе, с праздника: <b>' + giveGift(nextSabbat()[0]) + '</b>.', true);
     state.awayUntil = drawAway(false);
     save();
     hideSoon(30);
@@ -422,6 +467,7 @@
     setTimeout(function () {
       ui.style.display = 'none';
       hideBubble();
+      hidePickCard();
       save();
     }, sec * 1000);
   }
@@ -442,6 +488,7 @@
       if (state.offered && state.offered.d === todayKey()) {
         document.getElementById('fam-img').src = FAMILIARS[state.offered.t].sprite;
         show();
+        if (showPickCard(state.offered.t)) return;
         say('Ну так что? Останусь?' +
           '<div id="fam-choice"><button data-yes>Приму</button><button data-no>Иди с миром</button></div>',
           false, true);
